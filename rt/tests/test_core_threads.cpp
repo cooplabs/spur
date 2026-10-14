@@ -213,7 +213,9 @@ TEST(CoreThreads, TwoThreadsHammerTheHandBackCommitsStayTotallyOrdered) {
   EXPECT_EQ(seq_gaps.load(), 0);  // every generation pushed once, in order
   EXPECT_EQ(t_back.load(), 0);    // action times never go backwards
   EXPECT_EQ(static_cast<std::uint64_t>(records.load()) + seg.policy.drops(), s.policy_commits);
-  EXPECT_GT(s.policy_thread_runs, 100u);
+  // both paths ran and raced each other (the ordering checks above are the test): ~1,860 thread runs on a quiet host;
+  // GitHub's 4-vCPU runners: 67-1,863 across runs (ASan and TSan) with every ordering check holding
+  EXPECT_GT(s.policy_thread_runs, 10u);
   EXPECT_GT(s.inline_entries, 0u);  // the stalls did push the writer onto the inline rung
   EXPECT_EQ(s.faults_seen & R1RT_FAULT_POLICY_INVALID, 0u);
 }

@@ -90,6 +90,7 @@ def test_png_writer_round_trip() -> None:
     assert np.array_equal(px, img)
 
 
+@pytest.mark.needs_gl
 def test_headless_render_shows_the_robot() -> None:
     m = M.build_model("real", visual=False)
     ctrl = StandHold.for_model(m)

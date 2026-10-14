@@ -36,7 +36,17 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
-      - run: uv sync --locked
+      # mypy checks the DDS modules against CycloneDDS's Python binding (the `dds` extra: an sdist, built against
+      # our CycloneDDS 0.10.2 library - the same cached build as the test job)
+      - name: CycloneDDS 0.10.2 (cached; rt/idl/build_cyclonedds.sh's default prefix)
+        id: cdds
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/r1mc3/cyclonedds-0.10.2
+          key: cyclonedds-0.10.2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('rt/idl/build_cyclonedds.sh') }}
+      - if: steps.cdds.outputs.cache-hit != 'true'
+        run: bash rt/idl/build_cyclonedds.sh
+      - run: CYCLONEDDS_HOME="$HOME/.cache/r1mc3/cyclonedds-0.10.2" uv sync --locked --extra perception --extra dds
       - run: uv run ruff check .
       - run: uv run ruff format --check .
       - run: uv run mypy
@@ -75,12 +85,15 @@ jobs:
           CYCLONEDDS_HOME="$HOME/.cache/r1mc3/cyclonedds-0.10.2" uv sync --locked --extra perception --extra dds
       - name: C++ (Debug, sanitizers where they start)
         run: |
-          uv run cmake -S rt -B build/rt -G Ninja -DCMAKE_BUILD_TYPE=Debug -DR1RT_SANITIZE=ON
+          # ASan / UBSan on Linux (the robot's platform); macOS builds without them (GitHub's macOS starts ASan, which
+          # the project's macOS development machines cannot - not yet validated there)
+          uv run cmake -S rt -B build/rt -G Ninja -DCMAKE_BUILD_TYPE=Debug -DR1RT_SANITIZE=${{ runner.os == 'Linux' && 'ON' || 'OFF' }}
           uv run cmake --build build/rt
           uv run ctest --test-dir build/rt --output-on-failure
       - name: C++ with CycloneDDS (the r1rt / r1guard processes)
         run: |
-          uv run cmake -S rt -B build/rt_dds -G Ninja -DCMAKE_BUILD_TYPE=Debug -DR1RT_SANITIZE=ON \
+          uv run cmake -S rt -B build/rt_dds -G Ninja -DCMAKE_BUILD_TYPE=Debug \
+            -DR1RT_SANITIZE=${{ runner.os == 'Linux' && 'ON' || 'OFF' }} \
             -DR1RT_WITH_CYCLONEDDS=ON -DCMAKE_PREFIX_PATH="$CYCLONEDDS_HOME"
           uv run cmake --build build/rt_dds
           uv run ctest --test-dir build/rt_dds --output-on-failure
@@ -104,6 +117,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
       - run: uv sync --locked
+      # TSan's runtime cannot start with the 32 address-randomisation bits of current runner kernels
+      - run: sudo sysctl -w vm.mmap_rnd_bits=28
       - run: uv run cmake -S rt -B build/rt-tsan -G Ninja -DCMAKE_BUILD_TYPE=Debug -DR1RT_TSAN=ON
       - run: uv run cmake --build build/rt-tsan
       - run: uv run ctest --test-dir build/rt-tsan --output-on-failure

@@ -113,4 +113,5 @@ markers = [
   "slow: takes more than ~10 s",
   "realtime: depends on wall-clock timing (real-time mode); run alone for stable numbers",
   "needs_dds: needs CycloneDDS's Python binding (uv sync --extra dds); skipped when absent",
+  "needs_gl: renders through MuJoCo's OpenGL renderer; skipped where no OpenGL context can be made (a GPU-less VM)",
 ]

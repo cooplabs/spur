@@ -43,6 +43,14 @@ if(R1RT_TSAN)
   endif()
   add_compile_options(-fsanitize=thread -fno-omit-frame-pointer)
   add_link_options(-fsanitize=thread)
+  # GCC >= 11 warns (-Wtsan) that ThreadSanitizer does not instrument std::atomic_thread_fence - the seqlock's fences
+  # (rt/include/r1rt/seqlock.hpp). Under our -Werror that stopped every TSan build with GCC 13 (Ubuntu 24.04, found by
+  # the public CI, 14 Oct 2026); the warning stays visible, not fatal. TSan still checks every atomic and plain access.
+  include(CheckCXXCompilerFlag)
+  check_cxx_compiler_flag(-Wtsan R1RT_CXX_HAS_WTSAN)
+  if(R1RT_CXX_HAS_WTSAN)
+    add_compile_options(-Wno-error=tsan)
+  endif()
   set(R1RT_ACTIVE_SANITIZERS "thread")
 endif()
 message(STATUS "r1rt sanitizers: ${R1RT_ACTIVE_SANITIZERS}")

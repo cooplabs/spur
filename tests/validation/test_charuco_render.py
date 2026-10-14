@@ -9,6 +9,8 @@ from typing import Any
 import pytest
 from r1sim import charuco_render as cr
 
+pytestmark = pytest.mark.needs_gl  # every test renders the board through the head camera
+
 
 @pytest.fixture(scope="module")
 def chosen() -> dict[str, Any]:

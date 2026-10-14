@@ -23,6 +23,7 @@ def test_demo_end_to_end(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> 
     assert data[:8] == b"\x89PNG\r\n\x1a\n" and len(data) > 50_000
 
 
+@pytest.mark.needs_gl
 def test_demo_policy_and_fixture_lockstep(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     """No real-time part (not timing-dependent): the policy demo and the --fixture comparison both stand."""
     for extra, what in (([], "the balance policy"), (["--fixture"], "the session-1 stand-hold fixture")):

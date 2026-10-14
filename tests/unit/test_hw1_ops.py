@@ -325,6 +325,7 @@ def _max_gap_ms(p: subprocess.Popen[str], first_ns: int, until_ns: int) -> float
     return float(np.diff(ts).max()) * 1e-6
 
 
+@pytest.mark.realtime  # wall-clock: a 100 ms pause measured to < 140 ms (a shared CI VM: ~158)
 @pytest.mark.parametrize("in_process", [False, True])
 def test_sigstop_for_real_child(in_process: bool) -> None:
     child = _ticker()

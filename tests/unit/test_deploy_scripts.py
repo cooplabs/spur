@@ -22,8 +22,8 @@ SCRIPTS = [*sorted(DEPLOY.glob("*.sh")), DEPLOY / "bin" / "r1mc3-svc", DEPLOY / 
 REFUSED = 3
 
 
-def _run(args: list[str | Path], **kw: object) -> subprocess.CompletedProcess[str]:
-    env = {**os.environ, "LC_ALL": "C"}
+def _run(args: list[str | Path], env: dict[str, str] | None = None, **kw: object) -> subprocess.CompletedProcess[str]:
+    env = env if env is not None else {**os.environ, "LC_ALL": "C"}
     return subprocess.run([str(a) for a in args], capture_output=True, text=True, env=env, check=False, **kw)  # type: ignore[call-overload,no-any-return]
 
 
@@ -92,7 +92,8 @@ def test_every_script_parses() -> None:
         r = _run(["bash", "-n", s])
         assert r.returncode == 0, f"{s}: {r.stderr}"
     if shutil.which("shellcheck"):
-        r = _run(["shellcheck", "-S", "error", *SCRIPTS])
+        # UTF-8: shellcheck prints the offending source line, and under LC_ALL=C a non-ASCII comment crashes it
+        r = _run(["shellcheck", "-S", "error", *SCRIPTS], env={**os.environ, "LC_ALL": "C.UTF-8"})
         assert r.returncode == 0, r.stdout
 
 

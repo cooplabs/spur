@@ -9,6 +9,7 @@ session 2 (gate GA is session 4).
 
 from __future__ import annotations
 
+import platform
 import re
 from pathlib import Path
 from typing import Any
@@ -55,7 +56,11 @@ def test_model_bit_identical_to_mjlab() -> None:
     """Tolerance 0: failed (strict xfail) while model._remove_fist wrote the wrist mass / inertia with 9 significant
     digits (1 ulp off mjlab's float); passes since it writes them with repr() (session 2, integrator patch)."""
     ref = te.load_fields(ASSETS / "mjlab_model_fields.npz")
-    lines = te.diff_fields(ref, te.model_fields(M.build_model("train")), tol=0.0)
+    # Bit-exact on arm64, where the reference was made (macOS / Linux, as the robot's Orin). On x86_64 MuJoCo's compiler
+    # rounds a few derived fields (inertia frames, mesh-fitted geoms) differently in the last bits (the public CI's
+    # ubuntu-latest, 14 Oct 2026): a 1e-9 relative tolerance there.
+    tol = 0.0 if platform.machine() in ("arm64", "aarch64") else 1e-9
+    lines = te.diff_fields(ref, te.model_fields(M.build_model("train")), tol=tol)
     assert all(ln.split(":", 1)[0] in te.EXPLAINED_DIFFS for ln in lines), "\n".join(lines)
 
 

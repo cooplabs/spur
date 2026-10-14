@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Shared helpers for the deploy scripts (sourced, not run). DESIGN.md §11.2: a versioned release installed side by
 # side with the previous one, a `current` symlink switched atomically, rollback = switch back; v2 stays installed and
 # untouched. Every script takes:

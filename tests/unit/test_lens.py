@@ -129,6 +129,7 @@ def _match(found: np.ndarray, want: np.ndarray) -> np.ndarray:
     return np.asarray(d.min(axis=1))
 
 
+@pytest.mark.needs_gl
 def test_rendered_point_grid_lands_where_the_camera_model_says() -> None:
     """Small bright spheres on a grid in front of the camera, rendered (wide pinhole) and remapped: each blob's centroid
     in the 544 x 448 frame lies within 0.5 px of calib_head's / v2's projection of the sphere's centre."""
@@ -174,6 +175,7 @@ def _marks() -> list[tuple[tuple[float, float, float], tuple[float, float]]]:
     return out
 
 
+@pytest.mark.needs_gl
 def test_table_marks_render_where_the_calibration_puts_them() -> None:
     """The 4 Oct calibration capture rebuilt: the camera at T_base_site @ T_site_cam (the logged site pose and the
     fitted mount), dark dots at the 16 taped marks on a white table (table cm -> base: near edge 0.08 m, top 0.751 m,

@@ -33,6 +33,7 @@ def _render(app: App, w: int = 160, h: int = 120) -> np.ndarray:
         r.close()
 
 
+@pytest.mark.needs_gl
 def test_headless_frames_with_the_overlay(tmp_path: Path) -> None:
     out = tmp_path / "v"
     rc = main(["--headless", "--scene", "floor", "--controller", "hold", "--frames", "3", "--every", "0.2",
@@ -85,6 +86,7 @@ def test_the_policy_nan_key_freezes_the_real_core() -> None:
     assert dict(app.overlay())["controller"] == "core  STAND_FREEZE"  # rung 3: never limp, the operator resumes
 
 
+@pytest.mark.needs_gl
 def test_camera_presets_and_the_world_boxes(tmp_path: Path) -> None:
     wj = tmp_path / "w.json"
     wj.write_text(json.dumps(ENTITIES))
@@ -113,6 +115,7 @@ def test_camera_presets_and_the_world_boxes(tmp_path: Path) -> None:
         r.close()
 
 
+@pytest.mark.needs_gl
 def test_any_mjcf_file(tmp_path: Path) -> None:
     xml = tmp_path / "drop.xml"
     xml.write_text("""<mujoco><worldbody><geom type="plane" size="1 1 0.1"/>
@@ -159,6 +162,7 @@ class _FakeWindow:
         self.syncs += 1
 
 
+@pytest.mark.needs_gl
 def test_the_window_loop(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     import mujoco.viewer
     from r1sim.viewer.__main__ import _parser, interactive

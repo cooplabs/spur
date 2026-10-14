@@ -853,8 +853,10 @@ TEST(Guard, TwoThreadsOneSegmentTheTakeoverAndOneWriterAtATime) {
   core_thread.join();
   guard_thread.join();
   ASSERT_FALSE(early) << "the guard took over before the stall (host overloaded?)";
-  ASSERT_GT(core_ticks.load(), 100);
-  ASSERT_GT(guard_cycles.load(), 200);
+  // only that the core RAN before and after its stall (~600 ticks on a quiet host; GitHub's shared macOS runner: 70 -
+  // a 2 ms sleep lasted ~15 ms there); the one-writer checks below are the test
+  ASSERT_GT(core_ticks.load(), 30);
+  ASSERT_GT(guard_cycles.load(), 50);  // the guard ran throughout (~1,200 on a quiet host; GitHub's macOS: 178)
   const auto s = p.gstatus();
   EXPECT_EQ(s.takeovers, 1u);
   EXPECT_TRUE(p.guard.active());
