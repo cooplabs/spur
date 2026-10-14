@@ -1,0 +1,9 @@
+// Reconstructed from unitree_sdk2@63096d0 include/unitree/idl/hg/PressSensorState_.hpp (see rt/idl/SOURCE.md).
+module unitree_hg { module msg { module dds_ {
+struct PressSensorState_ {
+  float pressure[12];
+  float temperature[12];
+  unsigned long lost;
+  unsigned long reserve;
+};
+}; }; };

@@ -1,0 +1,19 @@
+# Blocks a reboot / shutdown / suspend request while r1rt or r1guard own the motors (DESIGN.md §2.1: "a reboot
+# request ... is refused"). Holds a systemd-inhibit "block" lock only while deploy/bin/r1mc3_motorcheck.py refuses;
+# `systemctl reboot` then fails with the lock's reason (privileged or not) instead of stopping r1rt under the robot.
+# It publishes nothing and never touches the robot.
+[Unit]
+Description=r1mc3 shutdown inhibitor while we own the motors
+After=r1rt.service r1rt-stand.service
+RefuseManualStop=yes
+
+[Service]
+Type=simple
+ExecStart=/opt/r1mc3/current/bin/python -I /opt/r1mc3/current/deploy/bin/r1mc3_inhibit.py --shm-name /r1mc3.rt
+Restart=always
+RestartSec=1
+Nice=5
+CPUAffinity=0 1 2 3 4
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,11 @@
+// Reconstructed from unitree_sdk2@63096d0 include/unitree/robot/internal/internal_idl_decl/RequestHeader_.hpp (see SOURCE.md here).
+#include "unitree/idl/api/RequestIdentity_.idl"
+#include "unitree/idl/api/RequestLease_.idl"
+#include "unitree/idl/api/RequestPolicy_.idl"
+module unitree_api { module msg { module dds_ {
+struct RequestHeader_ {
+  unitree_api::msg::dds_::RequestIdentity_ identity;
+  unitree_api::msg::dds_::RequestLease_ lease;
+  unitree_api::msg::dds_::RequestPolicy_ policy;
+};
+}; }; };

@@ -1,0 +1,62 @@
+# Provenance of the simulated motor-driver block (r1sim/driver.py, r1sim/engine.py): the real-equivalent profile's
+# command path and the board's behaviour when commands stop. Session 8: the board without commands MEASURED by HW1's
+# board-hold test (cmd_timeout_s, on_cmd_timeout, damp_kd = B6, docs/sim/B6_BOARD.md); the delays from HW1's step
+# replay (B2, docs/sim/TIER_B.md) and T5's lowstate age. Ranges: what the simulator's seeded variants may draw.
+# tests/unit/test_driver.py checks DriverConfig.real() = these.
+schema: r1mc3.provenance/1
+parameters:
+  cmd_delay_s:
+    value: 0.0
+    unit: s
+    status: measured
+    source: "HW1 B2 (hw1_20261011; the replay agent, docs/sim/TIER_B.md): the 14 S2 steps (results/hw1_20261010/end/session_part3) replayed in the hanging lockstep sim with the LOGGED 500 Hz command of every joint - the extra pure latency beyond the sim's own joint dynamics is 0-1 ms (on the stand-insensitive joints - knees, waist yaw, elbows, right shoulder pitch - the sim's delay-to-10 % median minus the real one is +0.4 ms with 0 ms delay, +1.5 ms with 1 ms). The real 16-44 ms command-to-motion spread is each joint's dynamics (kp, inertia, friction, the stand), not a delay: the wrap-up's '+5-8 ms' compared with a sim run that was not a replay of the same command"
+    date: 2026-10-11
+    profiles: [real]
+    range: [0.0, 0.002]
+    range_source: "the B2 fit's resolution (0-1 ms) widened to 2 ms"
+  state_delay_s:
+    value: 0.0005
+    unit: s
+    status: measured
+    source: "HW1 T5 (hw1_20261011; results/hw1_20261010 HW1_PART1.md B1.4): r1rt's lowstate age p50 0.49 / p99 1.02 / max 2.97 ms (idle and Wi-Fi busy alike); the engine quantises it to its 1 ms step (1 ms effective). With cmd_delay_s 0 the pair matches B2's measured total"
+    date: 2026-10-11
+    profiles: [real]
+    range: [0.0, 0.001]
+    range_source: "T5's p50 .. p99 lowstate age"
+  board_pd_rate:
+    value: "every physics step (1 kHz real profile, 200 Hz train profile)"
+    status: estimate
+    source: "the simulator evaluates the driver law inside each MuJoCo step; the real board's PD loop rate is UNKNOWN (V2_INVENTORY App. E §3.9 item 8); training evaluates its <position> actuators every 5 ms step (App. E §3.4)"
+    date: 2026-10-10
+    profiles: [train, real]
+    until: "HW1 per-joint step / chirp recordings at full rate (DESIGN §12.7 Tier B)"
+  cmd_timeout_s:
+    value: 0.385
+    unit: s
+    status: measured
+    source: "HW1's board-hold test (hw1_20261011; results/hw1_20261010/end/session_part4/records/, the 500 ms record of 20261011T215157Z, the board's 1 kHz tick): r1rt SIGSTOPped in ON_STAND, the guard observe-only - the 20 / 100 ms pauses moved nothing (<= 3e-5 rad), in the 500 ms pause the board released at ONE tick 383.8 ms after the SIGSTOP (all loaded joints in the same tick); r1rt's last LowCmd left 0-2 ms before the SIGSTOP and reached the board ~0.3-0.5 ms later -> 383-387 ms after the last LowCmd (one event). 9 Oct's '>= 4 s hold' was v2's DDS writer repeating the stale command, not a board without commands. sim/r1sim/b6_board.py, docs/sim/B6_BOARD.md"
+    date: 2026-10-11
+    profiles: [real]
+    range: [0.375, 0.400]
+    range_source: "one release seen (383-387 ms from the last LowCmd, tick-quantised); the wrap-up's receive-clock reading 395-400 ms is biased late by the recorder's delivery delays (p50 2.8 ms, p90 23 ms) and its detection threshold"
+  on_cmd_timeout:
+    value: damp
+    status: measured
+    source: "HW1's board-hold test (hw1_20261011): at the release the holding torques collapse within 1-2 ticks (L hip pitch tau_est -3.55 -> -2.54 -> -1.92 N m) and the loaded joints then sink at a nearly CONSTANT speed (hips 0.11-0.17 rad/s, shoulders 0.04-0.09) with tau_est = -kd x dq: a damping mode (kp 0, kd > 0), not zero torque (a free fall accelerates: ~0.03 rad by 500 ms vs the measured 0.014) and not a hold; seen for 116 ms (the test stopped at 500 ms by the user's decision)"
+    date: 2026-10-11
+    profiles: [real]
+  damp_kd:
+    value: 12.5
+    unit: N m s/rad
+    status: measured
+    source: "HW1's board-hold test (hw1_20261011), two estimates: (1) the motor side, median of -tau_est / dq over 395-495 ms on the 9 joints that sank: 13.2 (L / R hip pitch 16.5 / 13.2, knees 10.0 / 13.8, waist roll 16.5, shoulder pitch 11.5 / 10.6, shoulder roll 13.4 / 13.1); (2) the simulated stand at the HW1 attitude (dds_bridge.HW1_STAND) with the provisional HW1 friction: the hips' sink speed 0.117 / 0.133 rad/s needs kd ~11.6. One value for all body joints: the groups do not separate (left vs right differ as much as the groups do). sim/r1sim/b6_board.py"
+    date: 2026-10-11
+    profiles: [real]
+    range: [10.0, 17.0]
+    range_source: "the spread of the per-joint motor-side ratios (10.0-16.5) and the sim force-balance value 11.6"
+  train_actuator_kind:
+    value: position
+    status: official
+    source: "policies/r1mc2_manip2_lean_20261006T0421Z/params/env.yaml scene.entities.robot.articulation: BuiltinPositionActuatorCfg -> mjlab 1.2.0 mjlab/utils/spec.py create_position_actuator (gain kp, bias [0, -kp, -kv], ctrllimited false, inheritrange 0, forcerange +-effort_limit); V2_INVENTORY App. E §3.4"
+    date: 2026-10-10
+    profiles: [train]

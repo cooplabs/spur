@@ -1,0 +1,40 @@
+# r1mc3 (v3) real-time core, STAND SESSION (HW1, DESIGN §14.1): r1rt.service + `--stand-session` - the core refuses
+# EVERY entry into BALANCE (takeover, enter-balance, ...) for this process's whole lifetime; nothing clears it at run
+# time. Lifting it = starting the stack again WITHOUT it (`r1mc3-svc stop` -> `r1mc3-svc start`; DEPLOY.md "HW1: the
+# stand lock"; only with the user's OK). Conflicts= r1rt.service (symmetric): the two never run together. Same limits,
+# the same refused manual stop / never-kill stop and the same motor-ownership ExecStop check as r1rt.service. Not
+# enabled at boot: started by `r1mc3-svc start --stand` at B1.1.
+[Unit]
+Description=r1mc3 real-time core, STAND SESSION (r1rt --stand-session: BALANCE refused for its lifetime)
+Documentation=file:///opt/r1mc3/current/docs/hardware/DEPLOY.md
+After=network-online.target r1mc3-partition.service
+Wants=network-online.target r1mc3-partition.service
+# session 8 (fix #12): the RT CPU partition once per boot before the core (a failure there never blocks it)
+Conflicts=r1rt.service
+RefuseManualStop=yes
+
+[Service]
+Type=simple
+User=unitree
+# session 9 (#29's open race): the shared file + the real-time overlay (a bounded receive buffer; install.sh
+# --rt-dds-rcvbuf bounded|shared writes it)
+Environment=CYCLONEDDS_URI=file:///etc/r1mc3/cyclonedds.xml,file:///etc/r1mc3/cyclonedds_rt.xml
+ExecStart=/opt/r1mc3/current/bin/r1rt --config /etc/r1mc3/r1rt.cfg --shm-name /r1mc3.rt --domain 0 --stand-session
+ExecStop=-/opt/r1mc3/current/bin/python -I /opt/r1mc3/current/deploy/bin/r1mc3_motorcheck.py --shm-name /r1mc3.rt
+KillSignal=SIGTERM
+SendSIGKILL=no
+TimeoutStopSec=infinity
+Restart=no
+# RT limits (DESIGN §2.1): the writer thread FIFO 90 on CPU 7, the policy thread FIFO 80 and the DDS receive threads
+# FIFO 85 on CPU 6 - the process sets its threads itself; the unit grants the limits and the CPU set.
+CPUSchedulingPolicy=fifo
+CPUSchedulingPriority=90
+CPUAffinity=6 7
+LimitRTPRIO=95
+LimitMEMLOCK=infinity
+OOMScoreAdjust=-1000
+# No CPUAccounting / CPUQuota / CPUWeight here: on the stock L4T kernel (CONFIG_RT_GROUP_SCHED=y, cgroup v1) a unit
+# with its own cpu cgroup gets cpu.rt_runtime_us=0 and SCHED_FIFO fails with EPERM (RESEARCH.md §2.1); without them
+# the process stays in the root cpu cgroup. RT_SETUP.md's RT-grant check reads the grant (r1rt logs it, rt_granted).
+StandardOutput=journal
+StandardError=journal

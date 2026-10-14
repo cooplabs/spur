@@ -1,0 +1,20 @@
+# The R1 head camera's vignetting (session 4, 10 Oct 2026): the real frames darken toward the image edge (a
+# wide-angle lens), the simulated chain (pinhole render -> remap) did not. Measured as the median luminance ratio
+# real / sim per radius over the 14 paired A13 frames (the same scenes: the user's 9-10 Oct table runs and their sim
+# reconstructions, out/a13 run 2, Filament), normalised to the centre (r / r_max < 0.4; the centre's exposure ratio
+# 0.951 is a look setting, NOT applied here), fitted with an even polynomial (rms residual 0.019).
+# gain(r) = 1 + a2 x^2 + a4 x^4 + a6 x^6, x = r / r_max, r = px from the calibration's principal point (cx, cy).
+# Why it matters: on the sim frames the picture's bottom rows matched the grey pad of one model's square image frame
+# (RGB 128 vs 128; real 105-109), so that model misplaced its 0-1000 canvas on most sim calls (+29 px down; A13, S4.md).
+status: estimate
+date: 2026-10-10
+until: "HW1: a flat-field capture (a white sheet filling the head camera's view, several exposures)"
+r_max_px: 375.23
+a2: -0.0266
+a4: 0.0053
+a6: -0.4905
+measured:  # x = r / r_max: real / sim, normalised (the fit in brackets)
+  "0.675": [0.958, 0.943]
+  "0.775": [0.857, 0.880]
+  "0.875": [0.780, 0.763]
+  "0.975": [0.550, 0.558]

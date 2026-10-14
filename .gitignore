@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+
+# C++ / CMake
+build/
+compile_commands.json
+
+# Local site settings (machine paths, never committed)
+.site.env
+site.local.*
+
+# Generated output
+out/
+# Hardware session data + the session's ad-hoc helper scripts (HW1: ~1 GB; verified copies, never committed)
+results/
+MUJOCO_LOG.TXT
+.DS_Store

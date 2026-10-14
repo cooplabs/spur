@@ -1,0 +1,19 @@
+[project]
+name = "r1render"
+version = "0.1.0.dev0"
+description = "r1mc3's render-only worker: MuJoCo's Filament renderer on a newer MuJoCo than the physics (DESIGN D13)"
+license = "Apache-2.0"
+# Python 3.12: mujoco.rendering.filament needs collections.abc.Buffer (3.12+). The physics, controllers and tests stay
+# on the main project's Python 3.11 / mujoco 3.5.0 (the training version); this project only draws pictures.
+requires-python = "==3.12.*"
+dependencies = [
+  # Pinned exactly: the Filament Python API (mjrf) is young and its next release renames flags / removes functions
+  # (MuJoCo changelog "Upcoming", Oct 2026). 3.15.0 = the version of the session-3 probe (S3.md "Rendering").
+  "mujoco==3.15.0",
+  "numpy>=1.26,<3",
+]
+
+[tool.uv]
+# Not installed into its venv: the client starts r1render/worker.py as a script (python -I), so one venv serves any
+# checkout (the live folder, worktrees) and holds only the pinned dependencies.
+package = false

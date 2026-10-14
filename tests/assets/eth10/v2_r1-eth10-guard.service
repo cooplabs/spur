@@ -1,0 +1,11 @@
+[Unit]
+Description=R1 backpack: EEE off on eth10 + reset eth10 when the robot's main computer goes silent with the link up
+After=network-online.target NetworkManager.service
+
+[Service]
+ExecStart=/bin/bash /usr/local/bin/r1-eth10-guard.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,116 @@
+[project]
+name = "r1mc3"
+version = "0.1.0"
+description = "Controller and simulator for the Unitree R1 humanoid with two Dex3-1 hands (r1mc3, v3)"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+dependencies = [
+  # The logger r1log (session 4): RT / policy / hands rings -> MCAP files (zstd chunks). MIT; pulls zstandard + lz4.
+  "mcap>=1.2,<2",
+  # 3.5.0 = the MuJoCo / MuJoCo Warp version the balance policy was trained with (DESIGN.md §12.2).
+  # Changing it needs the sim2sim regression gate (RESEARCH.md §4.1 risk K2).
+  "mujoco==3.5.0",
+  "numpy>=1.26,<3",
+  "pydantic>=2.7,<3",
+  "pyyaml>=6.0",
+]
+
+[project.scripts]
+# The operator's CLI and the minimal service (session 5, M5a): docs/operator/R1_CLI.md, docs/api/README.md.
+r1 = "r1mc3.cli.main:main"
+r1d = "r1mc3.service.__main__:main"
+
+[project.optional-dependencies]
+# DDS from Python (session 5): the simulator's DDS bridge (DESIGN §12.4), r1d's hands / motion-switcher clients, the
+# HW1 recording tools. 0.10.2 = the version Unitree's hg types were generated with (rt/idl/SOURCE.md) and our C++ build.
+# No macOS wheel exists: it builds against our CycloneDDS C library - export CYCLONEDDS_HOME (scripts/ci.sh / run.sh
+# set it from R1MC3_DDS_PREFIX, default ~/.cache/r1mc3/cyclonedds-0.10.2). Linux has manylinux wheels.
+dds = ["cyclonedds==0.10.2"]
+# Perception on the robot (session 10, the measure agent): r1d's `measure.setup` / `measure.phone` detect the tags
+# with OpenCV (imported lazily: without it those words answer UNSUPPORTED). The same pin as the dev group; the
+# robot install (`--no-dev`) needs it as an extra: deploy/install.sh syncs `--extra perception` (manylinux aarch64
+# wheels exist).
+perception = ["opencv-python-headless>=4.10,<5"]
+
+[dependency-groups]
+dev = [
+  "pytest>=8.2",
+  "ruff>=0.6",
+  "mypy>=1.11",
+  "types-PyYAML",
+  # C++ build tools live in the venv (never system-wide): `uv run cmake`, `uv run ctest`.
+  "cmake>=3.28",
+  "ninja>=1.11",
+  # Validation only (never at run time on the robot): reads policy.onnx for v2's NumPy executor (the golden
+  # reference, imported from R1_V2_DIR) and cross-checks our own ONNX reader.
+  "onnx>=1.17,<2",
+  # Validation only: v2's image paths (JPEG placeholders) when v2 runs on r1sim through the adapter.
+  "pillow>=10",
+  # Build only: the Python binding of the C++ policy runner (rt/bindings, module r1rt_py) for the simulator's lockstep.
+  "nanobind>=2.4,<3",
+  # Validation only (session 3): the tag render test (ArUco / AprilTag detection on rendered head-camera frames,
+  # DESIGN §16 K7) and the lens-remap checks. Never at run time on the robot.
+  "opencv-python-headless>=4.10,<5",
+]
+
+# What the BACKPACK's release build needs (deploy/install.sh: `uv sync --no-dev --group build --extra dds`, session 6:
+# the Linux build check found Ubuntu 20.04's system cmake 3.16 < rt/CMakeLists' 3.24, Python 3.8 < 3.11, and no
+# nanobind / onnx in a --no-dev venv - so r1d / r1log had no r1rt_py and rtconfig no converted policy weights).
+build = [
+  "cmake>=3.28",
+  "ninja>=1.11",
+  "nanobind>=2.4,<3",
+  "onnx>=1.17,<2",
+]
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["python/r1mc3", "sim/r1sim"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+extend-exclude = ["docs", "build", "results"]  # results/ = hardware session data + its ad-hoc scripts (untracked)
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "NPY", "RUF"]
+ignore = ["RUF001", "RUF002", "RUF003"]   # unicode in prose (deg, x, ±) is intended
+
+[tool.mypy]
+python_version = "3.11"
+files = ["python", "sim", "tests"]
+strict = true
+warn_unreachable = true
+mypy_path = ["python", "sim"]
+explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+module = ["cyclonedds", "cyclonedds.*"]   # an optional dependency (the `dds` extra): typed, but absent in some envs
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["r1mc3.dds.hg"]   # CycloneDDS's IDL field syntax (types.array[T, N]) is not a mypy type; the module is generated
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["mujoco", "mujoco.*"]   # mujoco 3.5.0 ships no type stubs
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+  "slow: takes more than ~10 s",
+  "realtime: depends on wall-clock timing (real-time mode); run alone for stable numbers",
+  "needs_dds: needs CycloneDDS's Python binding (uv sync --extra dds); skipped when absent",
+]

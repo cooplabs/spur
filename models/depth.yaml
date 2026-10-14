@@ -1,0 +1,70 @@
+# The head camera's depth model (r1sim.depth; DESIGN §12.5, row A6) - schema 3, REFITTED in session 5 (10 Oct 2026; schema 2 =
+# session 4's fit, DepthConfig.s4()) to
+# the R1's recorded native depth (r1sim.tier_a.a6_depth.fit; the data slice tests/assets/tier_a/a6/real_depth_stats.json
+# from tools/tier_a/a6_extract.py): six table captures of 4-6 Oct with a logged camera pose (our runs_calib s2_cal,
+# s3_cal, 20261005-162451, s4_objects, s5_view, s6_view) against the known table plane (lab_setup.json: near edge
+# 0.081 m, top 0.751 m; the 4 Oct calibration), the far-edge step of capture2 (3 Oct), all 15 recorded frames for holes.
+# The real depth arrives as a 544 x 448 16-bit image in mm (P5 PGM, big-endian, 0 = no depth) aligned with the left
+# image, measuring depth along the camera axis (calib_head model "depth": "z"). Schema 1 (session 3's placeholders)
+# is DepthConfig.s3_placeholder(). Every value: what was measured, on what, with the residual; `until` = what
+# replaces it.
+schema: r1sim.depth/3
+quant_mm: {value: 1.0, status: measured, source: "the R1 depth stream is integer mm (depth_mm.pgm, 16 bit)"}
+blur_sigma_px:
+  value: 8.97
+  status: measured
+  source: "the low-pass of a step between two PLAIN surfaces (session 5: r1sim.depth.apply's `plain`, lens.PLAIN_SURFACE_GEOMS): the depth step at the table's far edge against the white wall (0.6 -> 0.9 m; capture2, 3 Oct) spreads over 23 px (10-90 %, median of 123 columns, p25-p75 19-23) = 2.563 sigma of a Gaussian. Nothing in the image anchors such a step (the left image's local contrast there, 0.085 grey-level std, is no lower than at the robot's sharp silhouette, 0.10: contrast alone does not separate the two - session 5)"
+  residual: "one capture, one kind of step; the real step response is not exactly Gaussian (block matching)"
+  until: "HW1 depth frames of a known step at several distances (B5's ChArUco board on the table)"
+  range: [6.0, 12.0]
+  range_source: "the columns' p10-p90 (16-25 px) / 2.563 + margin"
+blur_object_sigma_px:
+  value: 2.34
+  status: measured
+  source: "the low-pass at an OBJECT's outline (session 5): the depth step across the opaque test objects in the one recorded frame with objects (runs_calib/s4_objects, 4 Oct: a tall box's sides and top, a small round object's right side, a held tall cylinder's top; 80 profiles, a6_depth.OPAQUE_EDGE_REGIONS): 10-90 % width median 6 px (p25-p75 3-8.25) / 2.563. The robot's own silhouette in all six captures agrees (the recorded depth matches the sharpest low-pass tried there)"
+  residual: "one frame; per object 1 (the held tall cylinder, the tall box's left side) .. 14 px (the small round object)"
+  until: "HW1 depth frames of the test objects at measured places"
+  range: [1.2, 3.6]
+  range_source: "the widths' p25-p75 / 2.563"
+edge_fatten_px: {value: 0, status: modelling_choice, source: "the low-pass spreads a step symmetrically; the recorded step's position cannot separate fattening from the table's placement on 3 Oct", until: "HW1 step frames"}
+field_k0_per_m:
+  value: 0.0635
+  status: measured
+  source: "bias = z^2 (k0 + k_lr lr + k_ud ud + k_r2 rho^2) (a disparity error varying across the image: dz = z^2 dd / (f b)); fitted per frame with all four terms (session 5, a6_depth.frame_stats 'field4_per_m'); k0 per frame 0.008..0.121, mean of 6"
+  residual: "after this field 4.9-8.7 mm robust std per band on the table (mean of 6 frames; with session 4's three terms 10.5-17.3)"
+  until: "HW1 depth frames of a flat board at several distances"
+field_k_lr_per_m: {value: 0.4099, status: measured, source: "per frame 0.359..0.472, mean of 6 (four-term fit): the left half reads nearer, the right farther (v2: 'left half 3-6 cm high, right up to 6 cm low')", until: "HW1 flat-board frames"}
+field_k_ud_per_m: {value: 0.048, status: measured, source: "per frame -0.106..+0.224, mean of 6 (four-term fit; with three terms it read -0.21: it had absorbed part of the radial term)", until: "HW1 flat-board frames"}
+field_k_r2_per_m: {value: -0.5639, status: measured, source: "the RADIAL term (session 5): per frame -0.43..-0.78, mean of 6 - the image's edges read nearer in EVERY recorded frame (a rectification / lens residual of the stereo); this is what made the recorded error smallest at the image centre (S4's 'image-centre band')", until: "HW1 flat-board frames"}
+field_k0_spread_per_m: {value: 0.0431, status: measured, source: "std of k0 over the 6 frames (drawn per seed)"}
+field_k_lr_spread_per_m: {value: 0.0359, status: measured, source: "std of k_lr over the 6 frames (drawn per seed)"}
+field_k_ud_spread_per_m: {value: 0.1278, status: measured, source: "std of k_ud over the 6 frames (drawn per seed)"}
+field_k_r2_spread_per_m: {value: 0.1103, status: measured, source: "std of k_r2 over the 6 frames (drawn per seed, after the other three: a model without it keeps session 4's random streams)"}
+sigma_a_m:
+  value: 0.0045
+  status: measured
+  source: "the error's robust std after each frame's FOUR-term field, per distance band (3 bands x 6 frames): least squares sigma = a + b z^2 (session 5; session 4 fitted 13.99 mm on the three-term residual, which still held the radial bias)"
+  residual: "objects / hands / tape strips on the table are cut at 8 cm from the plane; per-band sim vs real in the A6 row (4 seeds per capture)"
+  until: "HW1 flat-board frames"
+sigma_b_per_m: {value: 0.01343, status: measured, source: "as sigma_a_m (the z^2 term: 6.1 mm at 0.32 m, 7.0 at 0.40 m, 8.6 at 0.52 m)"}
+corr_fine_px: {value: 4.75, status: measured, source: "the error's autocorrelation along rows after the four-term field (lags 1-96 px, mean of 6 frames) fitted by w1 exp(-k^2/(4 s1^2)) + w2 exp(-k^2/(4 s2^2)) + white; s1 (filter sigma)"}
+corr_coarse_px: {value: 15.0, status: measured, source: "s2 of the same fit"}
+corr_fine_weight: {value: 0.3592, status: measured, source: "w1 of the same fit (variance fraction)"}
+corr_coarse_weight: {value: 0.5705, status: measured, source: "w2 of the same fit; the white part is 1 - w1 - w2 = 0.070"}
+hole_fraction:
+  value: 0.0
+  status: measured
+  source: "0 zero pixels in all 15 recorded native depth frames (runs_calib x 12, v2's head probes x 3): the stream is dense. S3's 4.9 % was v2's depth_valid_fraction 0.951 misread: v2 counts pixels outside 0.10-3.0 m as invalid - the robot's own chest / arms nearer than 10 cm (4.1-5.1 % in the table pose), not holes"
+  until: "HW1 frames of a shiny board and a metal container (glare: the stream fills it with some depth; how wrong is unknown)"
+edge_hole_px: {value: 0, status: measured, source: "no holes at depth steps either (as hole_fraction)"}
+clear_stereo_opacity:
+  value: 0.35
+  status: fitted
+  source: "clear plastic (a clear box: a clear housing around a milky translucent roll, the user's photos of 10 Oct) is partly seen through by the stereo: a clear-plastic pixel reads opacity x the plastic + (1 - opacity) x what lies behind it (lens.depth_without). LUMPED and fitted on the clear box's APPARENT HEIGHT: the grid value (0.25-0.5) whose median object_extent height (v2's own, the reference layout, 5 seeds) is nearest the 5 hardware calls' median, 2.8 cm for the 6.6 cm tall clear box (a6_depth.fit_clear_opacity: 0.35 -> 2.9 cm). The clear box's shape call is therefore NOT an independent check; the small round object's and the tall box's are (no parameter fitted on them)"
+  residual: "opaque (1.0): the stereo would see the full box (round, 6.3-8.1 cm high); 0: the clear box vanishes (no object)"
+  until: "HW1 depth frames of the clear box standing on the board (and other clear objects)"
+  range: [0.25, 0.45]
+  range_source: "the grid values whose median apparent height lies within the hardware's 2.2-3.3 cm (2.5-3.5)"
+glare_fill_fraction: {value: 0.0, status: not_measured, source: "a HOOK (session 5): no recorded depth shows a shiny board or a metal container (no capture has either); the native stream fills what it cannot match with neighbouring depth (the dark floor), so glare would read as WRONG depth, not holes. 0 = off; the code path (depth.apply's `glare`, lens.GLARE_SURFACE_GEOMS) waits for data", until: "HW1 depth frames of the board and a metal container (the A6 HW1 runbook item)"}
+bias_lr_m: {value: 0.0, status: modelling_choice, source: "session 3's placeholder term, replaced by the disparity field (field_*); kept for DepthConfig.s3_placeholder()"}
+bias_smooth_m: {value: 0.0, status: modelling_choice, source: "session 3's placeholder term, replaced by the correlated error (corr_*)"}

@@ -1,0 +1,321 @@
+{
+ "mode": "robot",
+ "seconds": 60.0,
+ "windows": {
+  "off": {
+   "seconds": 61.36,
+   "r1rt": {
+    "mode": "ON_STAND",
+    "ticks": 31000,
+    "skipped_deadlines": 0,
+    "overruns": 0,
+    "lateness": {
+     "n": 31000,
+     "over_0p5ms": 0,
+     "over_1ms": 0,
+     "over_2ms": 0,
+     "max_ms": null,
+     "max_ms_so_far": 3001.111
+    },
+    "lowstate_rate_hz": 1052.5
+   },
+   "r1guard": {
+    "lateness": {
+     "n": 61000,
+     "over_0p5ms": 0,
+     "over_1ms": 0,
+     "over_2ms": 0,
+     "max_ms": null,
+     "max_ms_so_far": 33.598
+    },
+    "lowstate_age_ms_at_end": 0.122
+   },
+   "lowstate_age_at_r1rt": {
+    "n": 6074,
+    "p50_ms": 0.47550499999999996,
+    "p99_ms": 1.007971,
+    "max_ms": 1.978982
+   },
+   "cpu": {
+    "proc_pct": {
+     "r1rt": 9.8,
+     "r1guard": 4.9,
+     "r1cam": 0.0
+    },
+    "cpu_busy_pct": {
+     "cpu0": 8.4,
+     "cpu1": 9.3,
+     "cpu2": 8.2,
+     "cpu3": 8.3,
+     "cpu4": 7.7,
+     "cpu5": 4.5,
+     "cpu6": 18.1,
+     "cpu7": 1.4
+    }
+   },
+   "link_mbit_s": 29.49
+  },
+  "stream": {
+   "seconds": 61.36,
+   "r1rt": {
+    "mode": "ON_STAND",
+    "ticks": 30550,
+    "skipped_deadlines": 0,
+    "overruns": 0,
+    "lateness": {
+     "n": 30550,
+     "over_0p5ms": 0,
+     "over_1ms": 0,
+     "over_2ms": 0,
+     "max_ms": null,
+     "max_ms_so_far": 3001.111
+    },
+    "lowstate_rate_hz": 997.4
+   },
+   "r1guard": {
+    "lateness": {
+     "n": 62000,
+     "over_0p5ms": 0,
+     "over_1ms": 0,
+     "over_2ms": 0,
+     "max_ms": null,
+     "max_ms_so_far": 33.598
+    },
+    "lowstate_age_ms_at_end": 0.16
+   },
+   "lowstate_age_at_r1rt": {
+    "n": 6070,
+    "p50_ms": 0.512689,
+    "p99_ms": 2.855582,
+    "max_ms": 5.055014
+   },
+   "cpu": {
+    "proc_pct": {
+     "r1rt": 8.1,
+     "r1guard": 3.3
+    },
+    "cpu_busy_pct": {
+     "cpu0": 10.4,
+     "cpu1": 10.1,
+     "cpu2": 10.1,
+     "cpu3": 10.1,
+     "cpu4": 9.2,
+     "cpu5": 4.5,
+     "cpu6": 19.3,
+     "cpu7": 1.1
+    }
+   },
+   "link_mbit_s": 74.06
+  },
+  "record": {
+   "seconds": 61.36,
+   "r1rt": {
+    "mode": "ON_STAND",
+    "ticks": 30450,
+    "skipped_deadlines": 0,
+    "overruns": 0,
+    "lateness": {
+     "n": 30450,
+     "over_0p5ms": 0,
+     "over_1ms": 0,
+     "over_2ms": 0,
+     "max_ms": null,
+     "max_ms_so_far": 3001.111
+    },
+    "lowstate_rate_hz": 994.7
+   },
+   "r1guard": {
+    "lateness": {
+     "n": 61000,
+     "over_0p5ms": 0,
+     "over_1ms": 0,
+     "over_2ms": 0,
+     "max_ms": null,
+     "max_ms_so_far": 33.598
+    },
+    "lowstate_age_ms_at_end": 0.511
+   },
+   "lowstate_age_at_r1rt": {
+    "n": 6070,
+    "p50_ms": 0.522385,
+    "p99_ms": 2.7461059999999997,
+    "max_ms": 4.827423
+   },
+   "cpu": {
+    "proc_pct": {
+     "r1rt": 9.8,
+     "r1guard": 4.9
+    },
+    "cpu_busy_pct": {
+     "cpu0": 11.6,
+     "cpu1": 12.0,
+     "cpu2": 11.6,
+     "cpu3": 11.3,
+     "cpu4": 11.2,
+     "cpu5": 3.6,
+     "cpu6": 18.5,
+     "cpu7": 1.0
+    }
+   },
+   "link_mbit_s": 74.12,
+   "r1cam_recording": {
+    "schema": "r1mc3.r1cam_manifest/1",
+    "kind": "impact",
+    "label": "",
+    "params": {},
+    "status": "done",
+    "reason": "",
+    "source": "robot",
+    "streams": [
+     "left",
+     "right",
+     "depth"
+    ],
+    "depth_every": 1,
+    "frames": {
+     "left": 462,
+     "right": 462,
+     "depth": 471
+    },
+    "dropped_queue": 0,
+    "skipped_depth": 0,
+    "write_errors": 0,
+    "t_start_mono_ns": 1285775898322,
+    "t_end_mono_ns": 1348560931198,
+    "duration_s": 62.785,
+    "utc_start": "2026-10-13T03:11:24.215978+00:00",
+    "files": [
+     {
+      "path": "/var/lib/r1mc3/records/20261013T031124Z_cam_impact.r1cam.mcap",
+      "bytes": 173672853,
+      "sha256": "69b8ffff5d11a53d66b32b5de7f8c57cff23a2ba5ff1bd9fe9d8fa359a8c9b75"
+     },
+     {
+      "path": "/var/lib/r1mc3/records/20261013T031124Z_cam_impact.left.h264.mkv",
+      "bytes": 8675785,
+      "sha256": "9db9edfa493d576fe8964db4e9f725d8d1fd1fe4b7a54c50520a5a1632265cb7"
+     },
+     {
+      "path": "/var/lib/r1mc3/records/20261013T031124Z_cam_impact.right.h264.mkv",
+      "bytes": 8673757,
+      "sha256": "524d196635efc8565e7b0da6e7cc041e07157dde41ffcadbb63c222851266104"
+     }
+    ],
+    "source_stats": {
+     "source": "robot",
+     "streams": {
+      "left": {
+       "active": true,
+       "frames": 914,
+       "age_s": 0.328,
+       "error": null
+      },
+      "right": {
+       "active": true,
+       "frames": 914,
+       "age_s": 0.325,
+       "error": null
+      },
+      "depth": {
+       "active": true,
+       "frames": 933,
+       "age_s": 0.041,
+       "error": null
+      }
+     }
+    }
+   }
+  },
+  "off_again": {
+   "seconds": 61.36,
+   "r1rt": {
+    "mode": "ON_STAND",
+    "ticks": 30450,
+    "skipped_deadlines": 0,
+    "overruns": 0,
+    "lateness": {
+     "n": 30450,
+     "over_0p5ms": 0,
+     "over_1ms": 0,
+     "over_2ms": 0,
+     "max_ms": null,
+     "max_ms_so_far": 3001.111
+    },
+    "lowstate_rate_hz": 1052.4
+   },
+   "r1guard": {
+    "lateness": {
+     "n": 61000,
+     "over_0p5ms": 0,
+     "over_1ms": 0,
+     "over_2ms": 0,
+     "max_ms": null,
+     "max_ms_so_far": 33.598
+    },
+    "lowstate_age_ms_at_end": 0.7
+   },
+   "lowstate_age_at_r1rt": {
+    "n": 6075,
+    "p50_ms": 0.48353599999999997,
+    "p99_ms": 1.0066899999999999,
+    "max_ms": 2.873248
+   },
+   "cpu": {
+    "proc_pct": {
+     "r1rt": 8.1,
+     "r1guard": 3.3
+    },
+    "cpu_busy_pct": {
+     "cpu0": 8.0,
+     "cpu1": 8.2,
+     "cpu2": 8.1,
+     "cpu3": 7.7,
+     "cpu4": 7.2,
+     "cpu5": 3.7,
+     "cpu6": 17.5,
+     "cpu7": 1.1
+    }
+   },
+   "link_mbit_s": 29.49
+  }
+ },
+ "verdict": {
+  "off": {
+   "checks": {
+    "no_skipped_deadlines": true,
+    "lateness_max_le_0p4ms": false,
+    "age_p99_le_2ms": true,
+    "rate_ge_1000": true
+   },
+   "pass": false
+  },
+  "stream": {
+   "checks": {
+    "no_skipped_deadlines": true,
+    "lateness_max_le_0p4ms": false,
+    "age_p99_le_2ms": false,
+    "rate_ge_1000": false
+   },
+   "pass": false
+  },
+  "record": {
+   "checks": {
+    "no_skipped_deadlines": true,
+    "lateness_max_le_0p4ms": false,
+    "age_p99_le_2ms": false,
+    "rate_ge_1000": false
+   },
+   "pass": false
+  },
+  "off_again": {
+   "checks": {
+    "no_skipped_deadlines": true,
+    "lateness_max_le_0p4ms": false,
+    "age_p99_le_2ms": true,
+    "rate_ge_1000": true
+   },
+   "pass": false
+  }
+ },
+ "pass": false
+}

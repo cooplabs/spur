@@ -1,0 +1,35 @@
+# r1mc3 (v3) camera service r1cam (session 9; docs/plans/R1CAM_PLAN.md): the head stereo module's images + depth on
+# demand for r1d (127.0.0.1:8781), the camera recordings (MCAP + manifest into the records folder). The user's warning
+# (11 Oct): the camera has slowed other things before (v2, 5 Oct: the always-on depth stream on the 100 Mbit/s robot
+# link made the control loop overrun) -> r1cam stays OFF the RT CPUs (5-7: r1guard 5, r1rt 6-7), below normal priority
+# (Nice 10, idle-class disk I/O), memory-capped, every stream on demand and frame-dropping. It is NOT in r1mc3-svc's
+# start list: started explicitly (`sudo systemctl start r1cam`) after the camera impact test passes on the robot (HW2,
+# tools/cam/impact.py) - C1 PASSED on HW2 day 2 (the user accepted the camera for tasks); the user's choice at the end
+# of session 13 (13 Oct 2026): `sudo systemctl enable r1cam` at HW3 (SITE-3, with the user's OK on the day) so it starts
+# at every boot (day 2: forgotten after the swap's reboot). Stopping it at any time is safe: only perception requests
+# fail (with a code).
+[Unit]
+Description=r1mc3 camera service (r1cam)
+After=network-online.target
+
+[Service]
+Type=simple
+User=unitree
+Environment=CYCLONEDDS_URI=file:///etc/r1mc3/cyclonedds.xml
+Environment=R1_RECORD_DIR=/var/lib/r1mc3/records
+StateDirectory=r1mc3 r1mc3/records
+ExecStart=/opt/r1mc3/current/bin/python -m r1mc3.cam --source robot --port 8781 --records /var/lib/r1mc3/records --domain 0
+KillSignal=SIGTERM
+TimeoutStopSec=10
+Restart=on-failure
+RestartSec=5
+CPUAffinity=0 1 2 3 4
+CPUSchedulingPolicy=other
+Nice=10
+IOSchedulingClass=idle
+MemoryMax=1G
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,29 @@
+# r1mc3 (v3) logger r1log: drains r1rt's rings into MCAP files (DESIGN.md §9; docs/architecture/LOGGER.md). Low
+# priority (nice 10, idle-ish I/O) on CPUs 0-3; it can fall behind (rings drop with a counter), the RT core never
+# waits on it. Stopping it is safe (logs stop; the robot is unaffected).
+[Unit]
+Description=r1mc3 logger (r1log)
+# No Wants= on r1rt (session 6): starting this unit must never pull in the unlocked r1rt.service, which Conflicts=
+# r1rt-stand.service and would replace the stand session's core. r1mc3-svc starts the right core first.
+After=r1rt.service r1rt-stand.service
+
+[Service]
+Type=simple
+User=unitree
+# logs/ is r1d's R1LOG_DIR too (r1d.service: `r1 shutdown`'s log save and the recordings' manifests list these files)
+StateDirectory=r1mc3 r1mc3/logs
+Environment=R1LOG_DIR=/var/lib/r1mc3/logs
+ExecStart=/opt/r1mc3/current/bin/python -m r1mc3.log run --segment /r1mc3.rt --out /var/lib/r1mc3/logs --nice 10
+KillSignal=SIGINT
+TimeoutStopSec=20
+Restart=on-failure
+RestartSec=2
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+CPUAffinity=0 1 2 3
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

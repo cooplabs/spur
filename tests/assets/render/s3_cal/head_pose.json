@@ -1,0 +1,97 @@
+{
+ "obs_id": "h1",
+ "width": 544,
+ "height": 448,
+ "T_base_cam": [
+  [
+   -0.00355,
+   -0.58921,
+   0.80797,
+   0.09146
+  ],
+  [
+   -0.99998,
+   0.00634,
+   0.00023,
+   -0.00391
+  ],
+  [
+   -0.00526,
+   -0.80795,
+   -0.58922,
+   1.08511
+  ],
+  [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ]
+ ],
+ "T_base_site": [
+  [
+   0.80797,
+   0.003548,
+   0.589212,
+   0.091459
+  ],
+  [
+   0.000234,
+   0.99998,
+   -0.006343,
+   -0.003905
+  ],
+  [
+   -0.589223,
+   0.005263,
+   0.807953,
+   1.08511
+  ],
+  [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ]
+ ],
+ "joints": {
+  "left_hip_pitch": -0.308,
+  "left_hip_roll": 0.0292,
+  "left_hip_yaw": -0.1302,
+  "left_knee": 0.3356,
+  "left_ankle_pitch": -0.0991,
+  "left_ankle_roll": -0.0018,
+  "right_hip_pitch": -0.2989,
+  "right_hip_roll": -0.0341,
+  "right_hip_yaw": 0.132,
+  "right_knee": 0.3475,
+  "right_ankle_pitch": -0.1123,
+  "right_ankle_roll": 0.0084,
+  "waist_roll": -0.0007,
+  "waist_yaw": -0.0035,
+  "left_shoulder_pitch": 0.2049,
+  "left_shoulder_roll": 0.1897,
+  "left_shoulder_yaw": 0.0001,
+  "left_elbow": 0.8192,
+  "left_wrist_roll": -0.0101,
+  "right_shoulder_pitch": 0.2092,
+  "right_shoulder_roll": -0.1849,
+  "right_shoulder_yaw": 0.0046,
+  "right_elbow": 0.8152,
+  "right_wrist_roll": 0.0041,
+  "head_pitch": 0.607,
+  "head_yaw": 0.0026
+ },
+ "status": {
+  "rpy_deg": [
+   0.26,
+   1.33
+  ],
+  "body_cmd_deg": [
+   0.0,
+   0.0
+  ],
+  "tilt_deg": 1.34,
+  "mode": "WALK"
+ }
+}

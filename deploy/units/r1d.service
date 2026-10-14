@@ -1,0 +1,36 @@
+# r1mc3 (v3) service r1d: API (localhost:8780), goals, L0 / L1 streams, hands, the compat adapter (later). Python,
+# normal priority on CPUs 0-4 (DESIGN.md §2.1). Stopping or restarting it is safe at any time: the arms' keepalives
+# expire and they decelerate to HOLD inside r1rt; balance is unaffected.
+# KillMode=process (session 6): `r1 board-hold` / `r1 guard-takeover` run the SIGSTOP pause of r1rt and its SIGCONT
+# backstop in small child processes of r1d; with systemd's default (control-group) an r1d crash / restart mid-pause
+# would kill the backstop too and leave r1rt SIGSTOPped (with the guard off during the board-hold test). Only r1d's main process is stopped; the children finish.
+[Unit]
+Description=r1mc3 service (r1d)
+# No Wants= on r1rt (session 6): starting this unit must never pull in the unlocked r1rt.service, which Conflicts=
+# r1rt-stand.service and would replace the stand session's core. r1mc3-svc starts the right core first.
+After=r1rt.service r1rt-stand.service
+
+[Service]
+Type=simple
+User=unitree
+Environment=CYCLONEDDS_URI=file:///etc/r1mc3/cyclonedds.xml
+# Session 6: where r1d finds / writes the session's files - r1log's MCAP folder (= r1log.service's --out), the
+# recordings (`r1 record`), the session folders of `r1 shutdown`'s log save, and r1rt's own config file (= r1rt.service's
+# --config; read by r1d's dry runs). The folders are created + owned by deploy/install.sh and StateDirectory= below.
+Environment=R1LOG_DIR=/var/lib/r1mc3/logs
+Environment=R1_RECORD_DIR=/var/lib/r1mc3/records
+Environment=R1_SESSION_DIR=/var/lib/r1mc3/sessions
+Environment=R1RT_CONFIG=/etc/r1mc3/r1rt.cfg
+StateDirectory=r1mc3 r1mc3/logs r1mc3/records r1mc3/sessions
+ExecStart=/opt/r1mc3/current/bin/python -m r1mc3.service --shm-name /r1mc3.rt --domain 0 --port 8780
+KillSignal=SIGTERM
+KillMode=process
+TimeoutStopSec=10
+Restart=on-failure
+RestartSec=2
+CPUAffinity=0 1 2 3 4
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

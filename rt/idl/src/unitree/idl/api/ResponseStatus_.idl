@@ -1,0 +1,6 @@
+// Reconstructed from unitree_sdk2@63096d0 include/unitree/robot/internal/internal_idl_decl/ResponseStatus_.hpp (see SOURCE.md here).
+module unitree_api { module msg { module dds_ {
+struct ResponseStatus_ {
+  long code;
+};
+}; }; };

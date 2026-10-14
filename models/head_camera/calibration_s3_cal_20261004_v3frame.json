@@ -1,0 +1,41 @@
+{
+ "T_site_cam": [
+  [
+   0.04650818,
+   -0.322084502,
+   0.945567852,
+   0.002276055
+  ],
+  [
+   -0.998188689,
+   -0.051147732,
+   0.031674139,
+   0.029637639
+  ],
+  [
+   0.038161902,
+   -0.945328241,
+   -0.323879895,
+   -0.015394889
+  ],
+  [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ]
+ ],
+ "model": {
+  "lens": "pinhole",
+  "f": 126.93837623948386,
+  "cx": 258.9974949302926,
+  "cy": 203.9267499408583,
+  "k1": 0.024873407133458807,
+  "depth": "z"
+ },
+ "width": 544,
+ "height": 448,
+ "frame": "v3 (r1mc3.world.Geometry.set_stance: the IMU mount rotation undone)",
+ "note": "the 4 Oct s3_cal mount re-fitted in v3's base convention (session 10, r1sim.sysid.camera_mount; lens model unchanged): 16 marks 0.648 px RMS, left-out median 3.0 mm (v2's fit: 3.3 mm); the old mount with v3's pose: 4.427 px / 12.16 mm",
+ "source": "NB/runs_calib/s3_cal (tests/assets/tier_a/a5/s3_cal_marks.json)"
+}

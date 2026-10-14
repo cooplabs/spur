@@ -1,0 +1,653 @@
+# Provenance of every parameter of the simulator's robot model (r1sim/model.py, r1sim/dex3.py, r1sim/joints.py).
+# status: official (a Unitree file) | measured (on our robot / kit) | derived (computed from other entries) |
+#         reported (a secondary source, not re-measured) | estimate (our guess) | modelling_choice (a deliberate
+#         simulator setting). `until` says what replaces an estimate / reported value. tests/unit/test_provenance_model.py
+# checks that the values below equal the code's constants.
+schema: r1mc3.provenance/1
+parameters:
+  # ------------------------------------------------------------------ the base robot (both profiles)
+  r1_mjcf_file:
+    value: "models/r1/r1_mjlab.xml sha256 19c2291ce675217cc193092e59726bbd8d21c53bd5b2599912b60fe538f2de5f"
+    status: official
+    source: "unitree_rl_mjlab@1425b15f73bd4095f0df53709d7c389c3eb9e790 src/assets/robots/unitree_r1/xmls/r1.xml (the policy's training asset; = r1mc2 v2 assets/r1/r1_mjlab.xml; V2_INVENTORY App. E §2.1)"
+    date: 2026-10-09
+    profiles: [train, real]
+  r1_link_masses_inertias:
+    value: "r1.xml inertials (total 28.932 kg as shipped, head welded into a 7.3387 kg torso)"
+    unit: kg
+    status: official
+    source: "r1.xml = unitree_ros R1.urdf masses with lumped linkages (V2_INVENTORY App. E §0 fact 7, §2.2)"
+    date: 2026-10-09
+    profiles: [train, real]
+  r1_joint_limits:
+    value: "r1.xml joint ranges; r1sim.joints.Q_MIN / Q_MAX (rounded to 1e-4)"
+    unit: rad
+    status: official
+    source: "unitree_ros r1_description R1.urdf (v2 joints.py:43-55)"
+    date: 2026-09-28
+    profiles: [train, real]
+  r1_effort_limits_nm:
+    value: [60, 60, 60, 60, 50, 50, 60, 60, 60, 60, 50, 50, 60, 60, 60, 60, 33, 33, 33, 60, 60, 33, 33, 33, 33, 33]
+    unit: N m
+    status: official
+    source: "R1.urdf effort limits (hips/knee/waist/shoulder pitch+roll 60, ankles 50, forearm/head 33); actuator ctrlrange = +-these (v2 joints.py:56)"
+    date: 2026-10-09
+    profiles: [train, real]
+  sdk_joint_order_and_slots:
+    value: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 22, 23, 24, 25, 26, 29, 30]
+    status: measured
+    source: "unitree_sdk2_python example/r1/low_level body order; slot map confirmed by our 28 Sep 2026 read-only lowstate capture (v2 joints.py:1-29)"
+    date: 2026-09-28
+    profiles: [train, real]
+  wrist_pitch_excludes_removed:
+    value: "contact excludes left/right_elbow_link - *_wrist_pitch_link dropped"
+    status: modelling_choice
+    source: "r1.xml names bodies it does not have; v2 model.py:42-45; RES r1-controller-source-audit"
+    date: 2026-10-09
+    profiles: [train, real]
+  fist_mass_kg:
+    value: 0.143
+    unit: kg
+    range: [0.11, 0.18]
+    range_source: "the same solve as the nominal (v2 dex3.py:126-130): m_fist = 0.3248 kg x (0.068 - c_forearm) / (c_fist - c_forearm) with the assumed COMs c_forearm 0.03-0.04 m and c_fist 0.10-0.12 m gives 0.114-0.176 kg (nominal 0.035 / 0.11 -> 0.143)"
+    status: estimate
+    source: "v2 dex3.FIST_MASS (dex3.py:126-130): solved from the wrist_roll inertial (0.3248 kg, COM x 0.068) assuming forearm COM ~0.035 and fist COM ~0.11; the training kit uses the same number"
+    date: 2026-10-01
+    profiles: [train, real]
+    until: "weigh a stock fist / static arm-load identification on HW1"
+  forearm_com_x_m:
+    value: 0.035
+    unit: m
+    range: [0.030, 0.040]
+    range_source: "the assumed forearm-part COM of the fist solve, +-5 mm (v2 dex3.py:126-130; nothing measured)"
+    status: estimate
+    source: "v2 dex3.FOREARM_COM_X; wrist_roll inertia scaled by (m0 - fist) / m0 (v2 model.py:89-97, training get_spec_with_hands)"
+    date: 2026-10-01
+    profiles: [train, real]
+    until: "static arm-load identification on HW1"
+  hand_mount_pos_m:
+    value: [0.075, 0.0, 0.0]
+    unit: m
+    range: [[0.065, 0.090], [-0.005, 0.005], [-0.005, 0.005]]
+    range_source: "x: the stock wrist_roll mesh narrows at 0.07-0.08 m (v2 dex3.py:117-130) and the open hand landed ~1.5 cm behind a small round object on hardware (v2's 8 Oct session), so up to +1.5 cm; y, z: +-5 mm for an unmeasured flange (our bound)"
+    status: estimate
+    source: "r1mc2 dex3.MOUNT_POS (v2 dex3.py:117-130): the stock wrist_roll_link mesh narrows at x 0.07-0.08 m; G1 + Dex3 uses 0.0415 on wrist_yaw_link; the open hand landed ~1.5 cm behind a small round object on hardware (v2's 8 Oct session)"
+    date: 2026-10-01
+    profiles: [train, real]
+    until: "hand-eye capture on HW1"
+  hand_mount_rpy_rad:
+    value: [0.0, 0.0, 0.0]
+    unit: rad
+    range: [[-0.05, 0.05], [-0.05, 0.05], [-0.05, 0.05]]
+    range_source: "+-0.05 rad (~3 deg) per axis: a bolted flange with no measured offset (our bound until the hand-eye capture)"
+    status: estimate
+    source: "v2 dex3.MOUNT_RPY (palms face each other at wrist_roll 0, like G1 + Dex3)"
+    date: 2026-10-01
+    profiles: [real]
+    until: "hand-eye capture on HW1"
+  # ------------------------------------------------------------------ train-equivalent profile
+  train_head_welded:
+    value: "no head joints; r1.xml torso inertial (7.3387 kg incl. head) unchanged"
+    status: official
+    source: "training uses unitree_rl_mjlab r1_constants.get_spec() unchanged (V2_INVENTORY App. E §3.3)"
+    date: 2026-10-09
+    profiles: [train]
+  train_hand_lump:
+    value: {mass_kg: 0.697, com_m: [0.0667, "-+0.008 (left -, right +)", 0.0], inertia_diag: [6.0e-4, 1.4e-3, 1.2e-3], mount_x_m: 0.075, capsule: "fromto (0.015,0,0)-(0.15,+-0.01,0) r 0.035"}
+    status: derived
+    source: "training kit r1mc_manip_constants.py get_spec_with_hands (HAND_MASS, HAND_COM, MOUNT_X, inertia, capsule) - a rigid lump with the Dex3-1 URDF mass; the stock dummy hand capsule is kept"
+    date: 2026-10-05
+    profiles: [train]
+  train_collision:
+    value: "*_collision geoms: condim 1; feet condim 3, priority 1, friction 0.6"
+    status: official
+    source: "unitree_rl_mjlab r1_constants.py FULL_COLLISION (RES r1-controller-source-audit/upstream)"
+    date: 2026-10-09
+    profiles: [train]
+  train_joint_armature_frictionloss:
+    value: {legs_waist: [0.021354, 1.0], ankles: [0.00795, 0.8], arms: [0.01, 0.2]}
+    status: official
+    source: "training actuators (r1mc_constants.py armature rule kp = arm wn^2, wn 2 pi 10, zeta 2; arms r1mc_manip_constants.py _arm); V2_INVENTORY App. E §3.4. Joint damping stays r1.xml's default 0.05"
+    date: 2026-10-05
+    profiles: [train]
+  train_floor_friction:
+    value: [1.0, 0.005, 0.0001]
+    status: modelling_choice
+    source: "MuJoCo default; the feet's priority-1 friction 0.6 decides the foot contact (training terrain friction not read)"
+    date: 2026-10-09
+    profiles: [train]
+  train_physics_options:
+    value: {timestep: 0.005, integrator: implicitfast, solver: Newton, iterations: 10, ls_iterations: 20, cone: elliptic, impratio: 10, tolerance: 1e-08, ls_tolerance: 0.01, ccd_iterations: 50, jacobian: auto, gravity: 0 0 -9.81}
+    status: official
+    source: "policy params/env.yaml sim.mujoco :1496-1512 (identical for Manip2-Lean and Manip3; V2_INVENTORY App. E §3.2), applied by mjlab 1.2.0 sim/sim.py MujocoCfg.apply :75-89; ccd_iterations 50 (MuJoCo's default is 35) found by tools/sim2sim/model_diff.py in session 2"
+    date: 2026-10-10
+    profiles: [train]
+  train_actuator_semantics:
+    value: "MuJoCo <position> actuators as mjlab builds them (gain kp, bias [0, -kp, -kv], forcerange +-effort, ctrl not limited); the engine's driver kind 'position' (DriverConfig.train()); kp/kv/effort = model.TRAIN_PD (session 2; S1 used torque motors + the board PD, the same forces for dq_des = tau_ff = 0)"
+    status: official
+    source: "mjlab 1.2.0 actuator/builtin_actuator.py:31-89 + utils/spec.py create_position_actuator; env.yaml scene.entities.robot.articulation :119-187"
+    date: 2026-10-10
+    profiles: [train]
+  # ------------------------------------------------------------------ real-equivalent profile
+  real_torso_inertial:
+    value: {mass_kg: 6.024198, com_m: [-0.000648, -0.000052, 0.144497], fullinertia: [0.060949, 0.050645, 0.024602, -0.000060, 0.001044, -0.000164]}
+    status: official
+    source: "unitree_ros R1.urdf waist_yaw_link inertial (v2 model.py:47-55); the head is a separate articulated chain"
+    date: 2026-10-01
+    profiles: [real]
+  real_head_chain:
+    value: {head_pitch: {pos_m: [-0.006, 0.03155, 0.255], mass_kg: 0.50391253}, head_yaw: {pos_m: [0.0010126, -0.03155, 0.1165], mass_kg: 0.71432240}, ranges_rad: {pitch: [-0.62832, 0.62832], yaw: [-2.0071, 2.0071]}}
+    status: official
+    source: "unitree_ros R1.urdf head_pitch / head_yaw links and joints (v2 model.py:56-70)"
+    date: 2026-10-01
+    profiles: [real]
+  head_camera_site_m:
+    value: [0.08, 0.0, 0.0]
+    unit: m
+    range: [[0.06, 0.10], [-0.01, 0.01], [-0.02, 0.02]]
+    range_source: "+-2 cm along x / z, +-1 cm along y around v2's nominal site (model.py:70): our bound until the ChArUco capture; the calibrated T_site_cam lives in calib_head (V2_INVENTORY App. C §2) and is not this site"
+    status: estimate
+    source: "v2 model.py:70: nominal site on head_yaw_link (the calibrated T_site_cam lives in calib_head; V2_INVENTORY App. C §2)"
+    date: 2026-10-01
+    profiles: [train, real]
+    until: "the ChArUco full-field capture on HW1 (DESIGN §12.5)"
+  imu_site_m:
+    value: [0.0762025, 2.19914e-05, -0.0884315]
+    unit: m
+    status: official
+    source: "unitree_ros R1.urdf imu_in_pelvis_joint (= the IMU mesh position in r1.xml:72); r1.xml puts the site at the pelvis origin (0,0,0) - kept as is in the train profile (V2_INVENTORY App. E §2.2)"
+    date: 2026-10-09
+    profiles: [real]
+  dex3_kinematics_masses_limits:
+    value: "models/dex3_1/dex3_1_{l,r}.urdf: hand 0.6965 kg, 7 joints, limits, efforts 2.45 / 1.4 N m"
+    status: official
+    source: "unitree_ros@5994d4f robots/dexterous_hand_description/dex3_1 (vendored; tests/unit/test_dex3_urdf.py checks r1sim.dex3 against it)"
+    date: 2026-10-09
+    profiles: [real]
+  dex3_fingertip_offset_m:
+    value: 0.05
+    unit: m
+    range: [0.045, 0.055]
+    range_source: "+-5 mm around xr_teleoperate's 5 cm tip link (v2 dex3.TIP): the real contact point on the rounded tip is not measured"
+    status: reported
+    source: "xr_teleoperate assets/unitree_hand tip links 5 cm past the last joint (v2 dex3.TIP)"
+    date: 2026-10-01
+    profiles: [real]
+    until: "fingertip touch calibration on HW1"
+  dex3_collision_shapes:
+    value: "palm box 0.036 x 0.016 x 0.044 (half), finger capsules r 0.0095 / 0.0085, thumb sphere r 0.011 (v2 dex3.hand_xml)"
+    status: estimate
+    source: "v2 dex3.py hand_xml primitives approximating the Dex3-1 meshes (no meshes used)"
+    date: 2026-10-01
+    profiles: [real]
+    until: "a fit to the Dex3-1 meshes / scans"
+  dex3_pad_geometry:
+    value: "9 pad boxes per hand: palm 0.02 x 0.0015 x 0.011 at x 0.05; proximal 0.014 x 0.0015 x 0.008 at x 0.024; tip 0.010 x 0.0015 x 0.007 at x 0.034; thumb equivalents; finger map index -> 4/5, middle -> 2/3"
+    status: estimate
+    source: "v2 dex3.py:98-116, 164-213 (Dex3-1 manual layout; finger map measured 5 Oct 2026 by pressing)"
+    date: 2026-10-05
+    profiles: [real]
+    until: "33 per-cell sensors placed from the real cells (session 2) and pad presses with known weights on HW1"
+  dex3_contact_params:
+    value: {condim: 4, friction: [1.2, 0.02, 0.002]}
+    range: {friction: [[0.8, 1.6], [0.01, 0.04], [0.001, 0.004]]}
+    range_source: "sliding 0.8-1.6: the hand-object materials of our test objects (plastic 0.8 ... rubber 1.3, v2 GRIP_MATERIALS) up to a grippy pad; torsional / rolling x0.5-2 of v2's values (our bound until Tier B4)"
+    status: estimate
+    source: "v2 dex3.hand_xml"
+    date: 2026-10-01
+    profiles: [real]
+    until: "grasp identification per material (Tier B4)"
+  dex3_joint_params:
+    value: {armature: 0.0005, damping: 0.02, frictionloss: 0.01}
+    range: {armature: [0.0002, 0.002], damping: [0.01, 0.1], frictionloss: [0.005, 0.05]}
+    range_source: "no source for the nominal values (V2_INVENTORY App. E §2.4); x0.4-4 armature, x0.5-5 damping and frictionloss: our bound for small geared finger motors until finger steps / chirps on HW1"
+    status: estimate
+    source: "v2 dex3.hand_xml (no source; V2_INVENTORY App. E §2.4)"
+    date: 2026-10-01
+    profiles: [real]
+    until: "finger steps and chirps on HW1"
+  hand_self_collision_excluded:
+    value: "elbow - palm and every pair of hand bodies excluded"
+    status: modelling_choice
+    source: "v2 model.py:98-108: the real hand is built not to collide with itself; the primitive shapes would"
+    date: 2026-10-01
+    profiles: [real]
+  real_joint_armature_frictionloss:
+    value: {hips_knee_waist: [0.05, 2.5], ankles: [0.10, 1.5], shoulder_pitch_roll: [0.01, 2.5], shoulder_yaw_elbow_wrist_head: [0.01, 0.2]}
+    range: {hips_knee_waist: [[0.021354, 0.10], [1.0, 5.0]], ankles: [[0.00795, 0.20], [0.8, 3.0]], shoulder_pitch_roll: [[0.005, 0.02], [0.2, 5.0]], shoulder_yaw_elbow_wrist_head: [[0.005, 0.02], [0.1, 0.4]]}
+    range_source: "from the training values (r1mc_constants.py / r1mc_manip_constants.py: legs + waist 0.021354 / 1.0, ankles 0.00795 / 0.8, arms 0.01 / 0.2; V2_INVENTORY App. E §3.4) to ~2x the issue #51 report (0.05 / 2.5, ankles 0.10 / 1.5, shoulder pitch/roll friction 2.5); arm armature x0.5-2 of 0.01 (Unitree's placeholder, RES R5 §9.3 K4)"
+    status: reported
+    source: "unitree_rl_mjlab issue #51 (community reply 30 Jul 2026, step response + multi-sine on an unloaded R1; no Unitree badge) - as v2 model.py:115-130. Outside the training's armature randomisation for the ankles (0.10 vs 0.0056-0.020)"
+    date: 2026-10-01
+    profiles: [real]
+    until: "per-joint steps and chirps on HW1 (Tier B1)"
+  real_joint_damping:
+    value: 0.05
+    unit: N m s/rad
+    status: official
+    source: "r1.xml <default><joint damping=0.05> (kept)"
+    date: 2026-10-09
+    profiles: [train, real]
+  real_foot_contact:
+    value: {condim: 6, priority: 1, friction: [1.0, 0.005, 0.0001]}
+    range: {friction: [[0.6, 1.4], [0.002, 0.01], [0.00005, 0.0002]]}
+    range_source: "rubber sole on wood laminate: training randomised the foot friction 0.3-1.6 (env.yaml events foot_friction, V2_INVENTORY App. E §3.6); our narrower bound 0.6-1.4 around MuJoCo's default 1.0, torsional / rolling x0.4-2, until the sole friction test"
+    status: estimate
+    source: "r1.xml collision class (priority 1, condim 6, MuJoCo default friction) wins over the floor - as v2's sim"
+    date: 2026-10-09
+    profiles: [real]
+    until: "sole friction test on the lab floor (V2_INVENTORY App. E §4.1)"
+  real_floor_friction:
+    value: [0.8, 0.02, 0.01]
+    range: [[0.5, 1.2], [0.005, 0.04], [0.002, 0.02]]
+    range_source: "wood laminate floor, our bound around v2's value (model.py:138-139); only non-priority geoms see it (the feet's own friction wins)"
+    status: estimate
+    source: "v2 model.py:138-139 (only matters for non-priority geoms: the feet's own friction wins)"
+    date: 2026-10-01
+    profiles: [real]
+    until: "sole friction test on the lab floor"
+  backpack_mass_kg:
+    value: 0.454
+    unit: kg
+    range: [0.35, 0.60]
+    range_source: "the user's kitchen scale, 9 Oct 2026: 'around 1 pound' (0.454 kg) - +-0.1 kg for 'around' and the scale, +0.05 kg for its cables / brackets (not weighed with it)"
+    status: measured
+    source: "the user weighed the rear computing module on the kitchen scale, 9 Oct 2026: 'around 1 pound' (0.454 kg; approximate). Replaces the 2 kg of the v2 4 Oct sag fit (2 kg 15 cm behind / 10 cm above the torso CoM, v2 README.md:318), which was a FIT of an unknown load, not a weighing: the module explains only ~0.04 kg*m of that fit's ~0.30 kg*m backward moment, so the 4 Oct sag is NOT explained by the model any more (open item for A2, session 3)"
+    date: 2026-10-09
+    profiles: [real]
+  backpack_pos_m:
+    value: [-0.083, 0.0, 0.12]
+    unit: m
+    range: [[-0.086, -0.080], [-0.010, 0.010], [0.10, 0.14]]
+    range_source: "inside the rear handle frame of Unitree's torso mesh (bars x -0.098..-0.090, back plate ~-0.068, z 0.015..0.220): +-3 mm across the 3 cm space, +-1 cm sideways, +-2 cm in height (where in the frame the module's mass sits is not measured)"
+    status: derived
+    source: "the user (9 Oct 2026): the backpack sits within the black bars (the rear handle frame). Unitree's torso mesh (waist_yaw_link in unitree_rl_mjlab r1.xml, torso_link frame): bars x -0.098..-0.090, y +-0.061, z 0.015..0.220; back plate x ~-0.068; the box centre = the middle of that space. Replaces S1's first placement (15 cm behind / 10 cm above the torso CoM, from the sag fit), which stuck out ~10 cm behind the bars (test_backpack_sits_inside_the_rear_frame)"
+    date: 2026-10-09
+    profiles: [real]
+  backpack_box_half_m:
+    value: [0.015, 0.055, 0.09]
+    unit: m
+    range: [[0.010, 0.015], [0.040, 0.060], [0.060, 0.100]]
+    range_source: "the module's own size is not measured: at most the 3 x 11 x 18 cm space inside the frame (x, z) - y up to 12 cm - down to a 2 x 8 x 12 cm board stack (our bound); inertia only, no collision"
+    status: estimate
+    source: "the space inside the rear frame (3 x 11 x 18 cm) from the torso mesh; the module's own size is not measured; box for the inertia (uniform) and the picture; no collision"
+    date: 2026-10-09
+    profiles: [real]
+    until: "a tape measure on the module"
+  real_physics_options:
+    value: {timestep: 0.001, integrator: implicitfast, solver: Newton, iterations: 20, ls_iterations: 20, cone: elliptic, impratio: 10}
+    status: modelling_choice
+    source: "S1 choice: 1 ms as v2 (the explicit hand PD is stiff for the 0.0005 armature); implicitfast + elliptic + impratio 10 per RESEARCH §4.1 / R5 §9.3 K1"
+    date: 2026-10-09
+    profiles: [real]
+    until: "session 2 actuator / driver profiles"
+  # ------------------------------------------------------------------ poses and gains (r1sim.joints)
+  pose_stand:
+    value: {hip_pitch: -0.300, hip_roll: "+0.025 L / -0.025 R", hip_yaw: "-0.130 L / +0.130 R", knee: 0.455, ankle_pitch: -0.140, ankle_roll: "-0.050 L / +0.050 R", waist: 0.0, shoulder_pitch: 0.22, shoulder_roll: "0.193 L / -0.194 R", shoulder_yaw: "0.039 L / -0.033 R", elbow: 0.76, wrist: 0.0, head: 0.0}
+    unit: rad
+    status: measured
+    source: "the live policy's default pose = R1MC-Manip2 HOME = Unitree's stand lock as measured on our robot before every take-over (telemetry 5-6 Oct, symmetrised; training r1mc_manip_constants.py R1MC_MANIP2_HOME; ONNX default_joint_pos)"
+    date: 2026-10-06
+    profiles: [train, real]
+  stand_placement:
+    value: "soles level in pitch (base pitched -2.685 deg at POSE_STAND), lowest foot point 1 mm above the floor, foot-site midpoint at x = y = 0"
+    status: modelling_choice
+    source: "r1sim.model.stand_qpos (S1); with the base upright POSE_STAND points the toes 2.7 deg down; the real stand lock showed pitch -2.5 deg (v2 README.md:310)"
+    date: 2026-10-09
+    profiles: [train, real]
+  centred_stand_ankle_pitch_rad:
+    value: {train: -0.2040, real: -0.2136}   # real: -0.2061 before session 5's rear mass (1.6 kg, rear_mass_kg); -0.2200 with the first backpack (2 kg, 15 cm out); -0.2134 at 2 kg in the frame
+    unit: rad
+    status: derived
+    source: "r1sim.model.centred_stand_pose: both ankle pitches shifted so the CoM is over the foot centre with level soles; POSE_STAND under a balance-free stiff PD sags and falls backwards in both profiles (S1 check), as the real robot did on 4 Oct (`lock`, v2 README.md:310-318)"
+    date: 2026-10-09
+    profiles: [train, real]
+  kp_kd_stiff:
+    value: {kp: [200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 200, 300, 300, 100, 100, 100, 100, 50, 100, 100, 100, 100, 50, 50, 10], kd: [3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 5, 5, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0.1]}
+    status: official
+    source: "official R1 low-level example (unitree_sdk2_python), as v2 joints.KP_STIFF / KD_STIFF"
+    date: 2026-09-28
+    profiles: [train, real]
+  dex3_gains:
+    value: {kp: 1.5, kd: 0.2, rate_hz: 100}
+    status: reported
+    source: "xr_teleoperate Dex3_1_Controller (v2 dex3.py:41-44)"
+    date: 2026-10-01
+    profiles: [real]
+    until: "finger identification on HW1"
+  # ---- train-equivalent profile (session 2)
+  train_position_actuator_gains:
+    value: {legs_waist: [84.30221295234487, 5.366845561980516, 60.0], ankles: [31.38534199546416, 1.9980529276831085, 50.0], shoulder_pitch_roll: [60.0, 2.0, 60.0], shoulder_yaw_elbow: [45.0, 2.0, 33.0], wrist_roll: [30.0, 1.5, 33.0]}
+    unit: "[kp N m/rad, kv N m s/rad, effort N m]"
+    status: official
+    source: "policy params/env.yaml scene.entities.robot.articulation.actuators :119-187 (stiffness, damping, effort_limit); legs/ankles/waist by the armature rule of v2 training r1mc_constants.py:20-30 (the same float expression: bit-equal); r1sim.model.TRAIN_PD"
+    date: 2026-10-10
+    profiles: [train]
+  train_position_actuator_ctrl:
+    value: "ctrllimited false, inheritrange 0; informational ctrlrange [joint lo - effort/kp, joint hi + effort/kp]; forcelimited, forcerange +-effort"
+    status: official
+    source: "mjlab 1.2.0 utils/spec.py create_position_actuator (setpoints beyond the joint range allowed, force bounded by forcerange)"
+    date: 2026-10-10
+    profiles: [train]
+  train_collision_priority:
+    value: "FULL_COLLISION: every *_collision geom contype 1 conaffinity 1; feet (foot1-7) condim 3, priority 1, friction[0] 0.6; all other collision geoms condim 1 AND priority 0 (r1.xml's collision class says priority 1: S1 kept it, session 2 sets 0); other geoms no collision"
+    status: official
+    source: "env.yaml scene.entities.robot.collisions :188-210 + mjlab utils/spec_config.py CollisionCfg (priority default 0, disable_other_geoms); unitree_rl_mjlab@1425b15 r1_constants.py FULL_COLLISION; checked by tools/sim2sim/model_diff.py"
+    date: 2026-10-10
+    profiles: [train]
+  train_soft_joint_limit_factor:
+    value: 0.9
+    status: official
+    source: "env.yaml articulation.soft_joint_pos_limit_factor; mjlab uses it only for the soft-limit data the joint_pos_limits reward reads (entity data soft_joint_pos_limits), not in the physics or the action: nothing to model"
+    date: 2026-10-10
+    profiles: [train]
+  train_decimation_and_step:
+    value: {physics_dt_s: 0.005, decimation: 4, policy_dt_s: 0.02, observation_after_forward: true}
+    status: official
+    source: "env.yaml decimation :1 and sim.mujoco.timestep; mjlab envs/manager_based_rl_env.py step :340-416 (actuator targets held for 4 physics steps; sim.forward() before the observations, so the gyro is not one substep stale); r1sim.train_equiv"
+    date: 2026-10-10
+    profiles: [train]
+  train_reset_state:
+    value: {base_pos_m: [0.0, 0.0, 0.745], base_quat: [1, 0, 0, 0], joints: POSE_STAND, soles_above_floor_mm: 10.9}
+    status: official
+    source: "env.yaml scene.entities.robot.init_state :89-118 + events reset_base / reset_robot_joints (offsets 0 here; training randomises x, y +-0.5 m and yaw); the 10.9 mm sole clearance computed by r1sim.train_equiv.foot_clearance (every training episode starts with this drop)"
+    date: 2026-10-10
+    profiles: [train]
+  train_terrain_plane:
+    value: "mjlab TerrainEntityCfg(terrain_type='plane'): a plane geom in a static body 'terrain', MuJoCo default friction (1, 0.005, 0.0001), condim 3, solref/solimp default; contacts with the feet take the feet's priority-1 values"
+    status: official
+    source: "mjlab 1.2.0 terrains/terrain_entity.py _import_ground_plane :217-222; env.yaml scene.terrain terrain_type plane"
+    date: 2026-10-10
+    profiles: [train]
+  policy_metadata_rounding:
+    value: {action_scale: [0.178, 0.398], training_action_scale: [0.1779312722013518, 0.39827509293371766], kp: [84.302, 31.385], kd: [5.367, 1.998]}
+    status: derived
+    source: "policy.onnx metadata (3 decimals) vs env.yaml actions.joint_pos.scale :684-691 and the actuator gains; the deployed runner (v2 WalkPolicy, r1mc3 ReferencePolicy) uses the metadata. A1 S1 (walking) effect: 0.016 rad joint RMS, as large as MuJoCo-Warp vs MuJoCo-CPU"
+    date: 2026-10-10
+    profiles: [train, real]
+  # ------------------------------------------------------------------ session 3: the Dex3-1 drawing and collision
+  # (the user, 10 Oct: "the hands are not super accurate"; tools/hands/compare_collision.py, grasp_rig.py; S3.md)
+  dex3_visual_meshes:
+    value: "the 16 link meshes models/dex3_1/meshes/*.STL (sha256 in models/dex3_1/SOURCE.md) drawn as visual-only geoms <side>_hand_<link>_visual in the link frames (every URDF <visual> origin is identity); group 2, contype/conaffinity 0, density 0; the collision primitives / pads moved to group 3 (hidden in renders). Real profile only. Drawn from decimated copies (r1sim.dex3.decimate: vertex clustering, 1 mm cells, 325,668 -> ~84,000 triangles; cached outside the repo in $R1MC3_CACHE_DIR/dex3_visual): at full resolution a 970 x 825 render took 35 % longer (18.5 -> 25.5 ms); the copies stay within 1.7 mm (p99 < 1 mm) of Unitree's surface (tests/unit/test_dex3_visual.py)"
+    status: official
+    source: "unitree_ros@5994d4faef0a9cadd3287f8de0199a67eeb2a259 robots/dexterous_hand_description/dex3_1/meshes + dex3_1_{l,r}.urdf <visual>; physics bit-identical with / without (tests/unit/test_dex3_visual.py)"
+    date: 2026-10-10
+    profiles: [real]
+  dex3_visual_material:
+    value: {rgba: [0.10, 0.10, 0.11, 1], specular: 0.25, shininess: 0.3}
+    status: modelling_choice
+    source: "the real hand's matte black shell in the user's photos sim_capture/20261010_hand_photos/IMG_8768-8779 (10 Oct), by eye"
+    date: 2026-10-10
+    profiles: [real]
+  r1_wrist_fist_visual_cut:
+    value: "the drawn <side>_wrist_roll_link mesh drops the triangles whose centroid lies at x >= the Dex3 mount x (0.075 m nominal; the variant's mount): the stock mesh carries the R1's fist from x ~0.08 m, which poked through the Dex3 palm in every render. Load-time copy (inline vertex/face); the STL file is unchanged; the fist's MASS was already removed (fist_mass_kg)"
+    status: modelling_choice
+    source: "models/r1/meshes/{left,right}_wrist_roll_link.STL cross-sections (y widens from -0.029..+0.015 to -0.020..+0.034 m past x 0.08: the curled fingers); r1sim.model._wrist_mesh_cut"
+    date: 2026-10-10
+    profiles: [real]
+  train_profile_hand_drawing:
+    value: "unchanged: no Dex3 meshes, the stock wrist mesh with its fist (the train model must stay field-for-field mjlab's; tests/validation/test_a1_sim2sim.py compares every geom incl. visual ones at tolerance 0)"
+    status: modelling_choice
+    source: "session 3 finding (adding visual-only geoms to the train lump leaves the rollouts bit-identical but fails the A1 model diff)"
+    date: 2026-10-10
+    profiles: [train]
+  dex3_collision_geometry:
+    value: {default: primitives, variants: [primitives, mesh]}
+    status: modelling_choice
+    source: "r1sim.dex3.COLLISION. primitives = the S1 / v2 shapes (palm box, capsules, thumb_0 sphere, pad boxes). mesh = each link's convex hull of its Unitree mesh (MuJoCo's hull, full vertex count: maxhullvert 128 / 64 loses 7-8 mm), pads at the hull + dex3_pad_proud_m. The primitives vs the meshes (tools/hands/compare_collision.py): finger width 17-19 vs 25.7-26.0 mm, proximal pad faces 3.6 mm inside the real surface, distal 2.3-2.5 mm outside it, fingertip reach 48.5 vs 52.0 mm, palm front 78.0 vs 86.7 mm, the palm box's wrist-end corners up to 16 mm outside the tapered real palm. Grasp rig (object welded at v2's open-hand aim point): contact centroid moves < 3 mm for a 6 cm round object, ~6-8 mm for a tall box, ~6 mm across the fingers for a flat bar's pinch. Opt-in until A8 / A9 / A10 are re-run on it (S3.md); the mesh variant costs ~2x step time while the hands touch something (+41 % in a full-robot collapse)"
+    date: 2026-10-10
+    profiles: [real]
+  dex3_mesh_pad_shift_m:
+    value: {"0": 0.00365, "1": -0.00232, "2": 0.00365, "3": -0.00232, "4": 0.00365, "5": -0.00232, "6": 0.00114, "7": 0.00218, "8": 0.00114}
+    unit: m
+    status: derived
+    source: "the distance along each pad's normal from the S1 pad face centre to the link mesh's convex hull (+ = the hull lies beyond the face), both hands identical; tools/hands/compare_collision.py; re-measured by tests/unit/test_dex3_collision.py"
+    date: 2026-10-10
+    profiles: [real]
+  dex3_pad_proud_m:
+    value: 0.0005
+    unit: m
+    status: modelling_choice
+    source: "collision variant mesh: the pad boxes stand 0.5 mm proud of the hull so a touch on a pad's area reaches the pad first (the S1 pads stand 1.5 mm proud of their capsules); the real pads sit under the shell's skin"
+    date: 2026-10-10
+    profiles: [real]
+  hand_self_contact:
+    value: {excluded_pairs: [[palm, thumb_1], [palm, thumb_2]], all_other_hand_link_pairs: collide}
+    status: modelling_choice
+    source: "session 3 (A8 finding, the grip agent; the selfc change). S1 excluded EVERY pair of a hand's links (after v2's sim: 'the real hand is built not to collide with itself'), so the simulated thumb passed through the curled fingers and the 9 Oct false hold could not happen. Evidence the real Dex3 stops on itself: in the false holds (v2 log serve-20261009T230347Z, steps 7 / 17) the logged thumb_1 stayed at -0.56..-0.63 of its -0.9 command while thumb_2 ran on and the palm pads read 0; v2's verdict has a rule for pinch tips that meet (hands.py _escape (2), TIP_MEET_M). Only the palm-thumb pairs stay excluded: with them on, palm-thumb_1 overlaps from thumb_1 = -0.12..-0.15 rad with the primitives (the palm box's wrist-end corners stick out up to 16 mm past the real taper; the real thumb closes to -0.56 and beyond freely) and in EVERY pose with the mesh hull (7.5 mm; the hull fills the thumb slot), and palm-thumb_2 touches only in the fist preset (1.3 / 1.7 mm) - shape artefacts. Parent-child pairs are filtered by MuJoCo. Tests: tests/unit/test_hand_self_contact.py (6 fail on the S1 model), tests/validation/test_a8_false_hold.py (the model as built reproduces: step 7 holding 9/10, S1 hand 0/10)"
+    date: 2026-10-10
+    until: "Tier B4 (finger closing on the stand: does the thumb stop on the fingers where the sim says)"
+    profiles: [real]
+  # ---------------------------------------------------------------- session 4, cam agent (A5 / A6)
+  head_camera_depth_model:
+    value: {file: models/depth.yaml, schema: r1sim.depth/2, holes: 0.0, lowpass_sigma_px: 8.97, bias: "z^2 (k0 + k_lr lr + k_ud ud)", correlated_error_m: 0.014}
+    status: measured
+    source: "session 4 (A6): fitted to the R1's recorded native head depth (r1sim.tier_a.a6_depth.fit on tests/assets/tier_a/a6/real_depth_stats.json from tools/tier_a/a6_extract.py): six table captures of 4-6 Oct with a logged camera pose against the table plane, the far-edge step of capture2, all 15 recorded frames for holes (0 zero pixels: S3's 4.9 % was v2's valid fraction, i.e. the robot's own body nearer than 0.10 m). Sim vs recorded per band: sigma(z) 16.8 / 18.2 / 16.3 mm vs 17.3 / 10.5 / 14.2 (the image-centre band 1.7x, pinned); object_extent on sim depth: a standing clear box flat 5/5 and a tall box round 5/5 as on the robot (ground-truth depth: box / tall), a small round object flat 0/5 (robot: round 10/10, pinned: the recorded depth is sharp at the robot's own edges - a low-pass of 0 fits there best - while a 0.6 -> 0.9 m step spreads over 23 px: not one Gaussian; and the real clear box is clear plastic)"
+    date: 2026-10-10
+    until: "HW1: depth frames of a flat board at several distances, a known step, a shiny board and a metal container (glare), the test objects at measured places"
+    profiles: [real]
+  head_camera_mount_imu_coupling:
+    value: {imu_minus_legs_roll_pitch_deg_4oct: [0.26, -0.65], camera_pose_fk_minus_logged_mm: [12.1, 5.0, 1.0], angle_deg: 0.715, px_rms_fk: 3.48, px_rms_logged: 0.673}
+    status: derived
+    source: "session 4 (A5): the 4 Oct calibration's T_site_cam was fitted on v2's LOGGED site pose, which hangs on the IMU (status roll / pitch 0.26 / 1.33 deg); the simulated robot standing on level soles at the same joints has its pelvis at 0.0 / 1.98 deg (the legs). That attitude difference, rotated about the feet (0.65 deg x ~1.09 m), is the whole 12 / 5 / 1 mm, 0.72 deg camera offset S3 saw; through the mount it costs 3.5 px RMS on the 16 marks (from the logged pose: 0.673 px, target 1). So the head camera's mount and the IMU-to-pelvis offset are coupled: a mount fitted on an IMU-based pose absorbs that session's IMU error (here the IMU read 0.65 deg LESS forward pitch than the legs imply; S3 found 0.80-1.17 deg MORE in S14-S17 and 0.53 more on 9 Oct - same convention as far as checked (pitch + = nose down in both; the logged site pose equals the sim's rotated by exactly this): the offset is not constant even in sign across sessions, or the 4 Oct stance differed - for the IMU work to settle). tests/validation/test_a5_head_camera.py"
+    date: 2026-10-10
+    until: "HW1: IMU statics against a level + a ChArUco capture refitted in the leg-kinematic frame"
+    profiles: [real]
+  # ---------------------------------------------------------------- session 4: hands (the hands agent)
+  dex3_finger_pads:
+    value: {default: s1, variants: [s1, real], proximal_block_m: {along: [0.0206, 0.0433], half_width: 0.0099, face: 0.01465}, distal_face_m: 0.00754, distal_footprint_m: {along: [0.024, 0.044], half_width: 0.007}, distal_collides: false}
+    status: measured
+    source: "Unitree's Dex3-1 link meshes (models/dex3_1/meshes, identical for both fingers and the thumb, both hands), tools/hands/pad_geometry.py; the hand photos IMG_8775 / IMG_8779 (sim_capture/20261010_hand_photos): a raised rectangular block on each proximal phalanx (the 2x2 pads), a smooth bullet-shaped distal phalanx with no raised pad (the 3x1 tip arrays under the shell). The S1 / v2 layout: proximal pad face 11.0 mm (3.65 mm inside the real block, 8 mm too far back along the phalanx); distal pad face 10.0 mm (2.46 mm proud of the real shell at its centre, reaching the rounded nose). 'real' = proximal pads ON the block (colliding; + dex3_pad_proud_m over the hull in the mesh variant), distal pads as sensing regions on the shell (contype 0; the S1 in-plane extent, the cells' real extent unknown). The robot: 'the very fingertip is beyond the tip pads' (v2's grip failure log of 8 Oct, row 2: S9B t~1021 index pushed into the board, every pad <= 0.2 kPa; S10 thumb on the board <= 0.07 kPa). A10 row 2 (light tip touch) with 'real' + collision mesh: max 0.15 kPa (the touch lands on the distal phalanx's side 9.7 mm across its axis, past the pad) - matches the robot; with 'real' + primitives: 303 kPa (the 17 mm capsule puts the same side touch inside the 14 mm pad). NOT the default: with 'real' the A8 flat-bar pinch (a constructed placement) slips out between the rounded noses (both collision variants) and the primitives' step-7 false hold is lost. A8 (10 seeds) / A10 per variant (r1sim.tier_a.a10_variants, 10 Oct): primitives/s1 (DEFAULT) step 7 holding 9/10 (6 in 4-7 N), step 17 10/10 (1), flat bar 10/10 (10), row 1 0.924 N m, row 2 347 kPa; primitives/real 0/10, 10/10 (6), 0/10, 0.019, 304 kPa; mesh/s1 8/10 (6), 10/10 (3), 10/10 (1), 0.637, 52 kPa; mesh/real 10/10 (7), 10/10 (0), 0/10, 0.027, 0.15 kPa (real: holding 5.24 / 5.5 / 5.19 N, 1.0-1.4 N m, <= 0.2 kPa); the small round object's wrap stops by 'tactile' on all four (its contacts land on the distal noses / shoulders at the footprint's edges, within the 2 mm margin)"
+    date: 2026-10-10
+    until: "HW1 pad presses (a probe along each phalanx: where each 3x1 / 2x2 array starts and ends, and its kPa per N with known weights)"
+    profiles: [real]
+  hand_heat_onset_facts:
+    value: {rise_5s_c_at_0_9_nm: [22, 27], rise_5s_c_at_0_45_nm: [2, 11], creep_above_65c_at_0_9_nm_c_per_s: [0.12, 0.14], creep_below_65c_at_0_45_nm_c_per_s_median: 0.22, s12_peak_max_c: 64}
+    status: measured
+    source: "session 4, the A10 heat row: tests/assets/tier_a/a4/hand_thermal_1s.npz (1 s windows of serve-20261007T013019Z and serve-20261008T171613Z, the hottest motor, whole C), r1sim.tier_a.a10_hands.heat_onset, tests/validation/test_a10_heat.py. The two-pole hand model (hand_heat_* above, S3 fit) reads 53.9 C at 5 s (38 C, 0.9 N m) where the robot read 65 C. The 0.9 N m holds rise +22 / +27 C in 5 s and then creep at 0.12-0.14 C/s above 65 C; the 0.45 N m grasps creep at 0.13-0.88 C/s (median ~0.22) below 65 C and never pass 64 C: the creep is not faster at twice the torque, which no single-input two-pole model produces (a drive current limit near 65 C would - inferred, and it would also weaken the finger). Refits on the same 11 episodes: Joule heating (|tau|^2) + a derating above 65 C -> 58.1 C at 5 s (S12 RMS 3.7-4.6 C, the 7 Oct holds 10.0-11.6 C); |tau|^2.5 + derating reaches 64.9 C but the exponent has no physical basis here. The hand_heat_* values are NOT changed"
+    date: 2026-10-10
+    until: "Tier B4 / HW1: finger tau_est + temperature at full rate through a 0.9 N m hold (does the current drop above ~65 C?)"
+    profiles: [real]
+  # ------------------------------------------------------------------ session 4 (imu agent): the IMU's mounting rotation
+  imu_mount_offset_deg:
+    value: [0.50, 0.96]
+    unit: deg
+    status: estimate
+    source: "(roll, pitch) of the IMU in the pelvis = what the robot's IMU reads beyond the lean its leg encoders imply with the soles flat (S3 A9 finding; r1sim.tier_a.a9_short_grasps.stance_imu_offset / fit_imu_offset, a2_stance.logged). Quiet-stance means per session (roll, pitch): serve-20261009T021447Z (0.458, 0.804), T053857Z (0.397, 1.068), T085939Z (0.514, 1.119), T184113Z (0.567, 0.964), T230347Z (0.481, 0.950), serve-20261010T010206Z = the 9 Oct fall session (0.630, 0.534); the session-15 picks (21 snapshots) (0.52 +- 0.06, 1.17 +- 0.10). Nominal = the median of the six sessions' means; within a session the spread is 0.08-0.15 deg roll / 0.26-0.55 deg pitch per sample. Assumes flat soles and right leg encoder zeros: leg zero offsets or tilted soles would give the same difference without moving the hand - only the observed 1.5 cm short grasps single out the IMU (S3.md 'Not solid' 2). On the real profile's imu site (model.IMU_MOUNT_OFFSET_DEG, model.imu_offset_quat: roll about x, then pitch about y); the train profile has none (as trained)."
+    date: 2026-10-10
+    until: "HW1 IMU statics against a level (docs/hardware/HW1_IMU_LEVEL.md)"
+    profiles: [real]
+    range: [[0.40, 0.63], [0.53, 1.17]]
+    range_source: "the per-session means above (min .. max over six sessions' quiet stance and the session-15 picks): roll 0.397-0.630, pitch 0.534-1.17. The offset moves between sessions (start-up filter / calibration of the IMU, or the stance): a session's own value is data of that session (model.set_imu_offset), not a switch"
+  # ---------------------------------------------------------------- session 4 (fall agent): A7, the frozen stance
+  real_floating_base_joint:
+    value: {damping: 0.0, armature: 0.0, frictionloss: 0.0}
+    status: modelling_choice
+    source: "session 4 (A7, r1sim.tier_a.a7_stability). r1.xml's global `<default><joint damping=0.05 armature=0.01 frictionloss=0.2/>` is meant for the hinge joints, but MuJoCo applies it to `<joint type=free>` too: the pelvis had 0.2 N / 0.2 N·m of dry friction against the WORLD on all six base DOFs (+ 0.05 damping, 0.01 armature). A free body has no such friction (nothing joins the pelvis to the world). In the frozen 9 Oct stance it acted on exactly the unstable whole-body pitch mode: the frozen-PD stance's growth rate 0.27/s with it, 0.83/s without (mjd_transitionFD). The train profile keeps it: mjlab built the training robot from the same XML and A1 pins train = mjlab"
+    date: 2026-10-10
+    profiles: [real]
+  # ---------------------------------------------------------------- session 4: the integrator (A13 follow-up)
+  head_camera_vignetting:
+    value: {file: models/head_camera/vignetting.yaml, gain_at_0_775_rmax: 0.880, gain_at_0_875_rmax: 0.763, gain_at_0_975_rmax: 0.558}
+    status: estimate
+    range: {gain_at_0_775_rmax: [0.78, 1.0], gain_at_0_875_rmax: [0.66, 1.0], gain_at_0_975_rmax: [0.45, 1.0]}
+    range_source: "1.0 = no vignetting (the session-3 chain) .. the fitted gain minus 0.1 (the per-frame spread of the real / sim ratio was not computed; the fit's rms residual is 0.019)"
+    source: "session 4: the median luminance ratio real / sim per radius over the 14 paired A13 head frames (the user's 9-10 Oct table runs and their sim reconstructions), centre-normalised, even polynomial (rms 0.019); the simulated chain had none, so the sim frames' bottom rows matched the grey pad of one model's square image frame (128 vs real 105-109) and that model misplaced its 0-1000 canvas (A13)"
+    date: 2026-10-10
+    until: "HW1: a flat-field capture (a white sheet filling the head camera's view, several exposures)"
+    profiles: [real]
+  # ---------------------------------------------------------------- session 5: A6 depth (the depth agent)
+  head_camera_depth_model_s5:
+    value: {file: models/depth.yaml, schema: r1sim.depth/3, bias: "z^2 (k0 + k_lr lr + k_ud ud + k_r2 rho^2)", k_r2_per_m: -0.5639, lowpass_plain_sigma_px: 8.97, lowpass_object_sigma_px: 2.34, correlated_error_m: "0.0045 + 0.01343 z^2", clear_stereo_opacity: 0.35, glare_fill_fraction: 0.0}
+    status: measured
+    source: "session 5 (A6; r1sim.tier_a.a6_depth.fit on tests/assets/tier_a/a6/real_depth_stats.json from tools/tier_a/a6_extract.py). (1) The 'image-centre band' (S4: recorded 10.5 mm vs sim 18.2, 1.73x) was a BIAS, not position-dependent noise: fitted per frame with a radial term z^2 k_r2 rho^2 (rho = distance from the image centre in half-widths) k_r2 is -0.43..-0.78 /m in all six captures (the image's edges read nearer: a rectification / lens residual of the stereo), and the per-band error after it is 7.1 / 4.9 / 8.7 mm (three terms: 17.3 / 10.5 / 14.2); the noise amplitude is refitted on that residual. (2) The low-pass is per surface: a step between two plain surfaces (the table's far edge against the white wall, capture2) spreads 23 px (10-90 %), but the opaque objects' outlines in s4_objects (a tall box, a small round object, a held tall cylinder; 80 profiles) only 6 px median (p25-p75 3-8.25) and the robot's silhouette is sharp in every capture; the left image's local contrast does not separate the two cases (0.085 at the far edge vs 0.10 at the robot's edges, grey-level std), so the model uses the scene's plain surfaces (lens.PLAIN_SURFACE_GEOMS). S4's single 9 px Gaussian also smeared the hands' depth onto the table around them. (3) Clear plastic partly seen through (a clear box: clear housing, a milky roll inside; the user's photos): opacity 0.35 fitted on the clear box's apparent height (median of 5 hardware calls 2.8 cm of 6.6; sim 2.9 cm) - so the clear box's 'flat' is not an independent check. Result (A6 row, 4 seeds per capture): sigma per band 15.0 / 11.5 / 12.0 vs recorded 17.3 / 10.5 / 14.2 mm (ratios 0.87 / 1.10 / 0.84: all pass +-20 %; session 4's row reproduced exactly: 0.97 / 1.73 / 1.15); v2's object_extent on the reference layout (5 seeds): the small round object round 5/5 (S4 0/5; also with the clear box opaque: independent of the opacity fit), sizes 7.6-11.4 x 5.5-6.5 x 5.1-6.1 cm (robot 6.5-8.5 x 4.1-6.3 x 4.2-5.7); the tall box round 5/5 at 9.2-14.0 x 8.0-8.7 x 10.6-11.8 (robot 10.2-13.2 x 8.1-10.8 x 9.6-13.3; S4 13-24 x 12-15 x 7-10); the clear box flat 4/5 (one 'round' at 3.7 cm high). Glare (a shiny board / a metal container): a hook only, off (no recorded depth of either)"
+    date: 2026-10-10
+    until: "HW1: depth frames of a flat board at several distances (the field incl. its radial term), a known step between plain surfaces, the test objects at measured places (the object low-pass, the clear box's opacity), a shiny board and a metal container (glare)"
+    profiles: [real]
+  # ---------------------------------------------------------------- session 5 (com agent): the CoM fit (A2)
+  rear_mass_kg:
+    value: 1.6
+    unit: kg
+    status: estimate
+    source: "ONE CoM correction fitted to three sessions' commanded joint loads together (r1sim.tier_a.a2_com; S5.md): 9 Oct quiet stance under the policy (A2: the sim's ankles carried ~2x the logged torque), 4 Oct v2 STAND rocked back on the heels at IMU tilt 5.08 deg for 18 min (a2_oct4: the model rocked forward onto flat feet), 6 Oct hip-roll load stance (a2_oct6: the logged ankle-pitch torque -6.6 N m vs the model's +2.4 at the logged pose). Physical hypothesis: mass behind the torso the model lacks or misplaces - the expansion module's dock / rails around the weighed computing module (backpack_mass_kg), the hands' and head's cables routed to it, the quick-release battery's real place (Unitree's 'approx. 29 kg with battery' matches the URDF's ~28.9 kg sum, but nothing says where the battery sits, RESEARCH.md §1.8). Lumped at the rear module's place (model.REAR_MASS_POS = backpack_pos_m), inertia of the module's box. A moment (kg x lever), not a weighing"
+    date: 2026-10-10
+    until: "the reaction-board CoM measurement (the user's bathroom scale, U6: HW2's start or HW1) and a whole-robot weighing (more than the model's 30.4 kg + this mass = added mass; the same = misplaced mass)"
+    profiles: [real]
+    range: [1.0, 2.5]
+    range_source: "the sessions' own best values (a2_com fit grid, session 5): the joint cost is lowest at 1.6 kg, the largest value at which the 4 Oct STAND still sits back on its heels (3.4 deg; real IMU 5.08) - from 1.75 kg the sim tips over backwards (the real robot sat near that edge; its IMU attitude that day is unknown to +-1 deg and it carried the wrist cameras, forward mass the model lacks: the edge may lie higher); 9 Oct's A2 ankle rows (at the session's IMU offset) enter the +-0.03 rad target at 2.0 kg and match at ~3 kg; 6 Oct (a strained, squeezed stance) asks for more statically; 1.0 kg = where 4 Oct starts to rock back. Upper bound 2.5: 9 Oct's knees leave the target beyond ~3 kg"
+  # ---------------------------------------------------------------- session 6 (hang agent): the stand in the DDS-bridge sim
+  hw1_stand_cradle:
+    value: {bar_x_m: -0.17, bar_z_m: 0.93, bar_half_width_m: 0.06, loop_z_m: 0.66, loop_half_width_m: 0.06, loop_radius_m: 0.01, pole_radius_m: 0.02, pole_gap_m: 0.0, cradle_solref: [0.02, 1.0], clearance_m: 0.08}
+    status: estimate
+    source: "the user's photos IMG_8780 / IMG_8781 and words (10 Oct 2026, v3 session 6; no robot measurement): one vertical pole on a floor base, a padded cradle on top (a horizontal rubber-ribbed plate with a vertical tab each side); a black tubular harness frame bolted to the robot's upper back around the backpack; its TOP BAR rests in the cradle ('by the top metal bar on the harness on the back at the upper torso'); its lower loop / the backpack sits against the pole below. Modelled (r1sim.dds_bridge.StandSpec): the bar in the cradle = two soft CONNECT constraints at the bar's contact ends (a hinge about the lateral axis; bilateral - the real bar could lift off upward, nothing in HW1 pushes that hard), the pole = a capsule colliding only with the frame's lower loop (a one-sided pitch stop preloaded by the CoM's moment: 193 N at rest in the sim, tilt 1.65 deg); positions read off the photos against the model's torso (the bar just below the shoulder line, ~7 cm behind the back; the loop at about the hip level); the frame massless (if it stays on the robot its mass belongs to the robot's mass / CoM); the roll / yaw compliance is MuJoCo's default constraint softness (measured in the sim: ~13,000 / ~3,900 N m / rad - probably stiffer than the rubber pad; unmeasured)"
+    date: 2026-10-10
+    until: "HW1: the bar's and the loop's positions measured on the robot (a ruler from the shoulder joints), the hanging pitch read by the IMU in MONITOR, the feet's height above the floor, a gentle push on the hanging robot (roll / yaw / pitch stiffness from the IMU)"
+    profiles: [real]
+    range: {bar_x_m: [-0.25, -0.12], bar_z_m: [0.85, 0.98], loop_z_m: [0.55, 0.75], pole_gap_m: [0.0, 0.05], clearance_m: [0.03, 0.20]}
+    range_source: "read off the two photos against the model's torso (frame given in the standing reference: CoM-centred stand, feet on the floor, torso_link at x -0.004 z 0.778): the bar between the back of the torso + the backpack (~-0.12) and ~8 cm further back, between the shoulder-blade and the shoulder line; the loop between the waist and the hips; the pole touching the loop (0) to a visible gap; the feet 3-20 cm up (the photos do not show the feet)"
+  hw1_stand_builtin:
+    value: {default: zero_torque, variants: [zero_torque (publishing kp 0 / kd 0), zero_torque_silent, stand_lock, damp, damp_legs]}
+    status: modelling_choice
+    source: "the user (10 Oct 2026, v3 session 6): at power-on Unitree's controller is in ZERO TORQUE mode; the user can switch it to a stiff 'stand lock' (not balancing, legs stiff). Whether Unitree PUBLISHES rt/lowcmd in zero torque is unknown: both variants are emulated; today's ON_STAND gate needs a fresh built-in command, so a silent built-in is refused (R1RT_TAKEOVER_BUILTIN 9; tests/integration/test_dds_bridge_hanging.py)"
+    date: 2026-10-10
+    until: "HW1 block 1 (read-only): who writes rt/lowcmd in zero torque, at what rate, with which gains"
+    profiles: [real]
+  # ---------------------------------------------------------------- session 8 (fit agent): the legs' friction from HW1
+  leg_joint_stiction_hw1:
+    value: {left_hip_pitch: 0.585, left_hip_roll: 0.373, left_hip_yaw: 0.720, left_knee: 0.631, left_ankle_pitch: 2.516, left_ankle_roll: 1.445, right_hip_pitch: 0.585, right_hip_roll: 0.373, right_hip_yaw: 0.489, right_knee: 0.425, right_ankle_pitch: 2.074, right_ankle_roll: 1.181, waist_roll: 0.516, waist_yaw: 0.410}
+    unit: N m (MuJoCo joint frictionloss, real profile; joint damping stays real_joint_damping 0.05)
+    status: measured
+    source: "hw1_20261011: HW1 part 2's 14 stiction ramps on the stand (11 Oct 2026 12:51-12:58 PDT, ON_STAND, kp 40 / ankles 25 / waist roll 150; results/hw1_20261010/end/session_part3/records/20261011T1951..1958Z_ramp_<joint>.json + r1log_20261011T192459Z_002 / _003.mcap), fitted with r1sim.sysid.stiction.fit_joint after the session-8 fix (#27: the steady window from the breakaway, |v - vc| < 0.2 vc, >= 150 samples per direction). Per side (Fc +- se, h(0.1) / h(0.3) N m, Fs): hip pitch L 0.614 +- 0.045 (0.619 / 0.36 not steady, Fs 1.08), R 0.555 +- 0.032 (0.560 / 0.21 not steady, 0.66) -> 0.585; hip roll L 0.391 +- 0.022, R 0.354 +- 0.024 (0.3 not steady) -> 0.373; hip yaw L 0.720 +- 0.048 (0.725 / 0.597), R 0.489 +- 0.042 (0.494 / 0.409); knee L 0.631 +- 0.016 (0.636 / 0.564, Fs 0.95), R 0.425 +- 0.025 (0.430 / 0.330, 0.70); ankle pitch L 2.516 +- 0.030 (0.1 too few steady samples - the wrap-up script's 3.19 on 41 samples; h(0.3) 2.531), R 2.074 +- 0.029 (h(0.1) 2.49 on 99 samples, not valid; h(0.3) 2.089) - the S2 step offsets agree (2.6 / 2.1 N m at kp 200); ankle roll L 1.445, R 1.181 UNRELIABLE (no steady slide at kp 25; the loose session-5 gate; Fs 1.95 / 1.29); waist roll 0.516 +- 0.101 (kp 150, 0.3 not steady); waist yaw 0.410 +- 0.018 (0.415 / 0.364). The friction FALLS with speed on every joint with two valid speeds (Stribeck): Fc = h at the slowest valid speed - 0.05 x |v|. L / R averaged where they agree within 2 combined se. Session 5's fit read 0.47-3.35 with NEGATIVE damping on 12 of 14 joints (fix #27). Table: the session-8 fit notes (fit_s4_refit.json)"
+    date: 2026-10-11
+    profiles: [real]
+    until: "HW2's stand part (optional protocol change: a 0.05 rad/s sweep and longer fast sweeps for the hips / ankles; the ankle rolls at a stiffer kp) and the FLOOR part: the friction under the standing load (the bearings carry ~150 N standing, ~0 hanging) - friction that grows with load is underestimated here"
+    range: {left_hip_pitch: [0.410, 0.761], left_hip_roll: [0.261, 0.485], left_hip_yaw: [0.489, 0.936], left_knee: [0.425, 0.820], left_ankle_pitch: [1.761, 3.271], left_ankle_roll: [1.012, 1.879], right_hip_pitch: [0.410, 0.761], right_hip_roll: [0.261, 0.485], right_hip_yaw: [0.342, 0.720], right_knee: [0.298, 0.631], right_ankle_pitch: [1.452, 2.696], right_ankle_roll: [0.827, 1.535], waist_roll: [0.361, 0.671], waist_yaw: [0.287, 0.533]}
+    range_source: "+-30 % of each value, widened to the other side's value where L / R differ (hip yaw, knee, ankles): the stand protocol's own spread (L / R, the two speeds: hip yaw 0.725 -> 0.597, knee 0.636 -> 0.564, ankle pitch h(0.1) 3.19 vs h(0.3) 2.53) is ~15-25 %; +-30 % adds the joint temperature / day-to-day drift (not measured). It does NOT cover the loaded (standing) friction - unknown until HW2"
+  # ---------------------------------------------------------------- session 8 (refit2): the joint dynamics from HW1's B1 replay
+  real_joint_armature_hw1:
+    value: {left_shoulder_pitch: 0.0025, left_shoulder_roll: 0.0025, left_shoulder_yaw: 0.0025, left_elbow: 0.0025, left_wrist_roll: 0.0025, right_shoulder_pitch: 0.0025, right_shoulder_roll: 0.0025, right_shoulder_yaw: 0.0025, right_elbow: 0.0025, right_wrist_roll: 0.0025, head_pitch: 0.0025, head_yaw: 0.0025, left_hip_pitch: 0.008, left_hip_roll: 0.008, left_hip_yaw: 0.008, left_knee: 0.008, right_hip_pitch: 0.008, right_hip_roll: 0.008, right_hip_yaw: 0.008, right_knee: 0.008, waist_roll: 0.008, waist_yaw: 0.008}
+    unit: kg m2 (MuJoCo joint armature, real profile; the ankles keep real_joint_armature_frictionloss's 0.10, not identified)
+    source: "SESSION 9 (armature): the hips / knees / waist's 0.008 APPLIED (session 8 held it back because two sim rigs failed at start-up with it; both were rig artefacts: the stiction fit's synthetic hanging rig had a broken weld - MjSpec's default equality data read as a 1 m anchor, the robot rolled ~10 deg and stood on its right foot; A2-oct4 posed the robot 0.5 mm above the floor under full stance torques - posed on the floor it settles at 3.38 deg as 0.05 does at 3.31; the settled heel-edge stance switched live from 0.05 to 0.008 stays put; the session-9 armature notes). hw1_20261011: HW1 part 2's S2 steps / S3 chirps (11 Oct 2026, results/hw1_20261010/end/session_part3/records/*_step_*.json, *_chirp_*.json + r1log_20261011T192459Z_000-001.mcap) replayed in the hanging lockstep sim with the LOGGED 500 Hz command of every joint (r1sim.tier_b.replay; docs/sim/TIER_B.md; the session-8 replay notes + replay_identified_config.json), one family at a time on a coarse grid: ARMATURE hips / knees / waist ~0.008 (0.005-0.011; issue #51's 0.05 gave 1.6-1.9 x the real knee step's torque swing and +4-9 ms), arms / head <= 0.0025 (r1.xml's 0.01 too slow), the ankles NOT identified (friction-dominated: REAL_JOINT's 0.10 kept); FRICTION shoulder yaw / elbow / wrist / head yaw ~0.03 (the steps' plateau hysteresis; r1.xml 0.2), head pitch ~0.1; the shoulder pitch / roll: see shoulder_note; DAMPING elbows / head pitch ~1.0 (their step settling; r1.xml 0.05). The legs' / waist's friction is leg_joint_stiction_hw1 (the S4 ramps)."
+    status: measured
+    date: 2026-10-11
+    profiles: [real]
+    until: "HW2's stand part: arm sweeps at 0 / 0.5 kg (HW1_FITS.md session 8, B3) and a joint optimisation of the replay (today one family at a time on a coarse grid); a Stribeck arm friction if the sim needs the slow end (session 9)"
+    range: {left_shoulder_pitch: [0.0005, 0.005], left_shoulder_roll: [0.0005, 0.005], left_shoulder_yaw: [0.0005, 0.005], left_elbow: [0.0005, 0.005], left_wrist_roll: [0.0005, 0.005], right_shoulder_pitch: [0.0005, 0.005], right_shoulder_roll: [0.0005, 0.005], right_shoulder_yaw: [0.0005, 0.005], right_elbow: [0.0005, 0.005], right_wrist_roll: [0.0005, 0.005], head_pitch: [0.0005, 0.005], head_yaw: [0.0005, 0.005], left_hip_pitch: [0.005, 0.011], left_hip_roll: [0.005, 0.011], left_hip_yaw: [0.005, 0.011], left_knee: [0.005, 0.011], right_hip_pitch: [0.005, 0.011], right_hip_roll: [0.005, 0.011], right_hip_yaw: [0.005, 0.011], right_knee: [0.005, 0.011], waist_roll: [0.005, 0.011], waist_yaw: [0.005, 0.011]}
+    range_source: "0.0005-0.005 for the arms / head (the replay grid's floor .. 2x its bound 0.0025); the hips / knees / waist 0.005-0.011 (the replay's identified band, session 8)"
+  real_joint_frictionloss_arms_hw1:
+    value: {left_shoulder_pitch: 0.1, left_shoulder_roll: 0.1, left_shoulder_yaw: 0.03, left_elbow: 0.03, left_wrist_roll: 0.03, right_shoulder_pitch: 0.1, right_shoulder_roll: 0.1, right_shoulder_yaw: 0.03, right_elbow: 0.03, right_wrist_roll: 0.03, head_pitch: 0.1, head_yaw: 0.03}
+    unit: N m (MuJoCo joint frictionloss, real profile; the legs / waist are leg_joint_stiction_hw1)
+    source: "hw1_20261011: HW1 part 2's S2 steps / S3 chirps (11 Oct 2026, results/hw1_20261010/end/session_part3/records/*_step_*.json, *_chirp_*.json + r1log_20261011T192459Z_000-001.mcap) replayed in the hanging lockstep sim with the LOGGED 500 Hz command of every joint (r1sim.tier_b.replay; docs/sim/TIER_B.md; the session-8 replay notes + replay_identified_config.json), one family at a time on a coarse grid: ARMATURE hips / knees / waist ~0.008 (0.005-0.011; issue #51's 0.05 gave 1.6-1.9 x the real knee step's torque swing and +4-9 ms), arms / head <= 0.0025 (r1.xml's 0.01 too slow), the ankles NOT identified (friction-dominated: REAL_JOINT's 0.10 kept); FRICTION shoulder yaw / elbow / wrist / head yaw ~0.03 (the steps' plateau hysteresis; r1.xml 0.2), head pitch ~0.1; the shoulder pitch / roll: see shoulder_note; DAMPING elbows / head pitch ~1.0 (their step settling; r1.xml 0.05). The legs' / waist's friction is leg_joint_stiction_hw1 (the S4 ramps). THE SHOULDERS: shoulder pitch / roll nominal 0.1 N m (issue #51: 2.5). The evidence: (1) the replayed S2 steps at speed <= 0.05 (a 60-kp step that overshoots 8-24 % carries no 2.5); (2) the S5 / ON_STAND holds (B3, statics.fit_static): the friction band's sign term 0.01-0.12; (3) A3's 384 logged real holds (7-10 Oct, the robot balancing): the worst joint median 0.0078 rad at 2.5 (with the new armature / damping 0.0065), 0.0050 at 0.7, 0.0048 at 0.3, 0.0044 at 0.1, 0.0043 at 0.05 - flat below ~0.3; (4) the board-hold test's release: the shoulders sank at 0.053-0.061 rad/s under ~1.4-1.9 N m of gravity at the board's kd ~12.5 = ~0.7 N m at ~0.06 rad/s - the SLOW end of a Stribeck curve that MuJoCo's Coulomb frictionloss cannot carry together with (1). 0.1 = the top of (1)-(2), A3 as good as 0.05; the range reaches the board-hold test's 0.7. B6 (the board release) keeps its own shoulder override (r1sim.b6_board.HW1_FRICTIONLOSS)."
+    status: measured
+    date: 2026-10-11
+    profiles: [real]
+    until: "HW2's stand part: arm sweeps at 0 / 0.5 kg (HW1_FITS.md session 8, B3) and a joint optimisation of the replay (today one family at a time on a coarse grid); a Stribeck arm friction if the sim needs the slow end (session 9)"
+    range: {left_shoulder_pitch: [0.02, 0.8], left_shoulder_roll: [0.02, 0.8], left_shoulder_yaw: [0.01, 0.2], left_elbow: [0.01, 0.2], left_wrist_roll: [0.01, 0.2], right_shoulder_pitch: [0.02, 0.8], right_shoulder_roll: [0.02, 0.8], right_shoulder_yaw: [0.01, 0.2], right_elbow: [0.01, 0.2], right_wrist_roll: [0.01, 0.2], head_pitch: [0.03, 0.3], head_yaw: [0.01, 0.2]}
+    range_source: "shoulder pitch / roll 0.02-0.8 = from the fast steps (<= 0.05) through the holds' band (B3: 0.01-0.12) to the board-hold test's sink (~0.7 at ~0.06 rad/s: the slow end of a Stribeck curve); the other arm / head joints 0.01-0.2 (up to r1.xml's 0.2); head pitch 0.03-0.3"
+  real_joint_damping_hw1:
+    value: {left_elbow: 1.0, right_elbow: 1.0, head_pitch: 1.0}
+    unit: N m s/rad (MuJoCo joint damping, real profile; every other joint keeps real_joint_damping 0.05)
+    source: "hw1_20261011: HW1 part 2's S2 steps / S3 chirps (11 Oct 2026, results/hw1_20261010/end/session_part3/records/*_step_*.json, *_chirp_*.json + r1log_20261011T192459Z_000-001.mcap) replayed in the hanging lockstep sim with the LOGGED 500 Hz command of every joint (r1sim.tier_b.replay; docs/sim/TIER_B.md; the session-8 replay notes + replay_identified_config.json), one family at a time on a coarse grid: ARMATURE hips / knees / waist ~0.008 (0.005-0.011; issue #51's 0.05 gave 1.6-1.9 x the real knee step's torque swing and +4-9 ms), arms / head <= 0.0025 (r1.xml's 0.01 too slow), the ankles NOT identified (friction-dominated: REAL_JOINT's 0.10 kept); FRICTION shoulder yaw / elbow / wrist / head yaw ~0.03 (the steps' plateau hysteresis; r1.xml 0.2), head pitch ~0.1; the shoulder pitch / roll: see shoulder_note; DAMPING elbows / head pitch ~1.0 (their step settling; r1.xml 0.05). The legs' / waist's friction is leg_joint_stiction_hw1 (the S4 ramps)."
+    status: measured
+    date: 2026-10-11
+    profiles: [real]
+    until: "HW2's stand part: arm sweeps at 0 / 0.5 kg (HW1_FITS.md session 8, B3) and a joint optimisation of the replay (today one family at a time on a coarse grid); a Stribeck arm friction if the sim needs the slow end (session 9)"
+    range: {left_elbow: [0.5, 1.5], right_elbow: [0.5, 1.5], head_pitch: [0.5, 1.5]}
+    range_source: "the replay's coarse grid neighbours of 1.0 (r1.xml's 0.05 lets the elbow / head pitch steps ring)"
+  # ------------------------------------------------------------------ session 12 (cam): the head camera after HW2 day 1
+  head_camera_lens_c3_20261012:
+    value: {lens: pinhole, f: 125.063, cx: 257.698, cy: 205.257, k1: -0.0007, rms_px: 0.389, loo_rms_px_median: 0.331, all_frames: {f: 124.971, cx: 257.902, cy: 205.168, k1: -0.0022, rms_px: 0.343}}
+    unit: px (544 x 448 left image of Unitree's stereo service, stream stereo_patch_pc1/left)
+    status: measured
+    source: "HW2 day 1 C3 (12 Oct 2026, results/hw2_20261012/cam/20261013T032404Z_cam_charuco.r1cam.mcap, 325 s, the printed poster_6x4_90 board): r1sim.sysid.camera_fit lens --still (the plan's hold-still frames: 83 views of 36 / 81 holds; degenerate views dropped - one view of 6 corners along a line had stopped OpenCV's calibrateCamera at its STARTING guess f 150 / the image centre, day 1's '18 % off' reading). The installed 4 Oct lens (f 126.94, cx 259.0, cy 203.9, k1 0.025, fitted with the mount from 16 coplanar marks in one image) is within 1.6 % / ~1.5 px; on the table at the working view the two files' ground points agree within 3.5 mm median (11 mm max). Candidate file: models/head_camera/calibration_c3_20261012_candidate_v3frame.json (NOT installed)"
+    date: 2026-10-12
+    profiles: [real]
+    until: "a mount fitted under this lens on new data (r1mc3.measure.head_mount: a still board, a grid of head poses) and the user's OK to install it"
+  r1cam_depth_rcvbuf_bytes:
+    value: 16384
+    unit: bytes (SO_RCVBUF of r1cam's depth socket, set before connect; Linux doubles it internally)
+    status: modelling_choice
+    source: "session 12 (r1mc3.cam.streams): HW2 day 1's C1 - while r1cam streamed, eth10 carried +44.6 Mbit/s (the depth ~39: 487 KB frames ~10 /s; each H.264 image ~1.1) and the robot's state packets arrived 5 % fewer with p99 age 2.9 ms. The receive buffer bounds the TCP window = the depth bytes that can queue ahead of a state packet on the shared path (16 KB = ~1.3 ms at 100 Mbit/s vs ~39 ms for a whole frame), while 16 KB per round trip still carries 16 MB/s at a 1 ms RTT (the depth needs 4.9 MB/s)"
+    date: 2026-10-12
+    profiles: [real]
+    until: "HW2 day 2's C1 re-run (work / work_fast windows; R1CAM_DEPTH_RCVBUF to compare)"
+    range: [4096, 65536]
+    range_source: "below ~4 KB the depth falls behind its 10 /s at a 1 ms round trip; above 64 KB a queued burst reaches ~5 ms"
+  r1cam_depth_keep_s:
+    value: 0.5
+    unit: s (the depth stream's keep after an observe received its frame; was IDLE_S 3 s after every request)
+    status: modelling_choice
+    source: "session 12 (r1mc3.cam.streams): an observe needs ONE depth frame; keeping the stream 3 s after each request sent ~30 frames (~14.6 MB on the robot's link) per observe. Sim (tools/cam/impact.py sim, an observe every 3 s): the depth link 39 -> 8.4 Mbit/s"
+    date: 2026-10-12
+    profiles: [real]
+    until: "HW2 day 2's C1 re-run"
+  # >>> s12:grip (session 12: r1hands' pad contact + the air pinch, from HW2 day 1's real hands)
+  dex3_pad_contact_threshold_raw:
+    value: 40.0
+    unit: raw Dex3 pad units above the pad's tare (r1mc3.hands.contact.CONTACT_THRESHOLD; the pads read ~100,000 raw at rest, quantised in steps of 8)
+    source: "HW2 day 1 (12 Oct 2026, results/hw2_20261012/HW2_PART1.md H2 / H4; h2_pads_rest*.json, h4/*, stand_c/records/*pad_press*): at rest after a good tare the pads' noise sd 5-8 raw and at most +16 above the tare in 10 s (both hands); the force gauge (H4): the TIP pads answer only above ~10 N and by WHERE the tip lands (e.g. right middle 0 / +8 / +18392 / 0 raw), i.e. a firm-contact switch with no usable raw-per-newton gain; every touch the pads register at all >= ~1,800 raw. The user's decision 12 Oct ~17:55: 5 -> 40 raw (5 quantisation steps, between the noise and a registered touch)."
+    status: measured
+    date: 2026-10-12
+    profiles: [real]
+    range: [17.0, 1800.0]
+    range_source: "above H2's largest at-rest excursion (+16) and below the weakest touch the pads registered (H4)"
+  dex3_pad_drift_raw_per_s:
+    value: 0.1
+    unit: raw / s - how fast r1hands' pad tare may follow a pad's reading, the SAME rate up and down (r1mc3.hands.contact DRIFT_UP_RAW_S = DRIFT_DOWN_RAW_S = 0.1), frozen while r1d holds a grip on that side
+    source: "HW2 day 1's r1log (results/hw2_20261012/stand_b/r1log/r1log_20261013T012915Z_00*.mcap, /r1hands/contact at the then 5-raw threshold, one tare at 01:30:41 UTC): the TIP and PALM pads of both hands (the idle left one too) read > 5 raw over the tare 0.3 -> 0.9 of the time within 10-15 min and 1.0 from ~30 min on (a mean drift >= ~20 raw: ~0.01 raw/s); ~3 h later (H4, stand_c/records/*pad_press_*.mcap at-rest samples) they sat ~+100 raw above H2's tares while the proximal pads had fallen 1,000-1,500 raw. 0.1 raw/s = ~10 x the observed drift; a registered touch (>= ~1,800 raw) needs hours to be absorbed; equal rates keep the tare at the pad's median."
+    status: derived
+    date: 2026-10-12
+    profiles: [real]
+    range: [0.02, 1.0]
+    range_source: "2 x the observed tip / palm drift .. still 30 min for a registered touch to be absorbed"
+  dex3_air_pinch_reference_m:
+    value: {right: -0.00642, left: -0.0093}
+    unit: m - the tip-shell clearance of the capsule model where the REAL tips touch (an air pinch, r1mc3.hands.calibration; the plausible range AIR_PINCH_MIN_M -0.012 .. AIR_PINCH_MAX_M 0.006)
+    source: "HW2 day 1, H3 on release 5e0130b (results/hw2_20261012/h3_pinch_right_fix.json / h3_pinch_left_fix.json): `r1 calibrate-pinch` closed both hands' tip pinches on nothing, thumb + index both 'stall', the user saw the tips touch; the tip pads read 0.00-0.02 kPa (refused then: the 1.5 kPa rule) and the model's tips' POINTS were 1.55 / 5.48 mm past their meeting distance (AIR_PINCH_APERTURE_MAX_M 10 mm). Session 12 accepts such a close from the stall."
+    status: measured
+    date: 2026-10-12
+    profiles: [real]
+  # <<< s12:grip
+  # >>> s13:grip (session 13: the pinch verdict on HW2 day 2's real grasp traces; the hand's heat)
+  dex3_pinch_model_under_read_m:
+    value: 0.013
+    unit: m - how much NARROWER the capsule hand model reads a closed pinch's tip-point aperture than the object between the tips (r1mc3.hands.grip.PINCH_MODEL_ERR_M; the pinch's gap rule needs max(GAP_MIN_M, 0.5 x width - this))
+    source: "HW2 day 2 (13 Oct 2026) grasp traces, the user saw every one held (results/hw2_20261013/floor_a/records/grasp_20261014T0130*-0131*, 0135*-0137*; replays fg_trace_replays.txt): a short clear box (21 mm) read 8.37-8.89 mm (12.1-12.6 mm under), a flat bar (48 mm) 42.3-43.5 mm (4.5-5.7 under); a tall cylinder's wrap (80 mm) 78.7-79.6. The largest pinch under-read + 0.4 mm. Cause (geometry): a pinch holds on the distal PADS with the distal links converging, so the tip points sit inside the object's sides; the real air pinch (tips on tips) reads +1.55 / +5.48 mm (no under-read)."
+    status: measured
+    date: 2026-10-13
+    profiles: [real]
+    range: [0.0126, 0.02]
+    range_source: "the clear box's largest under-read .. a low object's low grips still pass at a 4.4 cm grasp width up to ~0.019 (no evidence beyond)"
+  dex3_pinch_tips_met_margin_m:
+    value: 0.003
+    unit: m - the distal shells' clearance (capsule model, r1mc3.hands.grip.tip_clearance) a pinch must keep above the hand's air-pinch reference (layer_zero_m; 0 = the model's own, when none is given) to count as NOT tips-met (PINCH_MET_MARGIN_M) - in the verdict AND in the lift / hold
+    source: "HW2 day 2's traces: held pinches +8.4-8.7 mm (the clear box), +17.1-17.2 (a low object, low), +38.2-39.0 (the flat bar); the low object's two slips fell from +18 / +20 to -6 mm when it slid out (= the right hand's real air pinch -6.42, HW2 day 1's H3); the real air pinches -6.42 / -9.30 mm. 3 mm: the sim's empty pinch reads ~+2.2 mm (its tip pads), above it; every real held pinch 5+ mm above it."
+    status: derived
+    date: 2026-10-13
+    profiles: [real]
+    range: [0.0025, 0.008]
+    range_source: "above the sim's empty pinch (+2.2) .. below the held clear box (+8.4)"
+  r1d_lift_rise_after_request:
+    value: {delay_s: 0.40, rate_m_s: 0.04}
+    unit: the arm's grasp-centre rise after a lift request as r1d measured it (r1mc3.hands.trace.LIFT_DELAY_S / LIFT_RATE_M_S) - only to RECONSTRUCT the lift notifications of a trace whose grip was NOT_HOLDING at the close (r1d notified it of the rise only while TENTATIVE)
+    source: "HW2 day 2: the 20 traces that stayed TENTATIVE into the lift, their recorded notifications vs the journal's lift request (arm.move_relative dz 0.08): first rise 0.30-0.67 s after the request (median ~0.38), 1 cm 0.1-0.65 s later"
+    status: derived
+    date: 2026-10-13
+    profiles: [real]
+  # <<< s13:grip
+  # >>> s13:ops (session 13: the R1's battery in r1d's status, read-only)
+  r1_bms_units:
+    value: {bmsvoltage: mV, current: "mA (negative = discharging)", cell_vol: mV, temperature: "deg C"}
+    unit: the fields of unitree_hg BmsState_ on rt/lf/bmsstate as r1mc3.battery decodes them
+    source: "v2's bms_to_dict (r1-motor-controller-v2/r1mc2/backends/robot.py:96-108, 'units as read on the R1 (30 Sep)'); HW2 day 2's helper (results/hw2_20261013/tools/r1battery.py) read 64 %, 34.59 V, -3.06 A, cells 3.847-3.854 V, 32 C on the robot (STEPS.md DS9) with the same decode; the message layout = v2's fake SDK's real reading (tests/fake_sdk/unitree_sdk2py/idl/unitree_hg/msg/dds_/__init__.py:56-69)"
+    status: measured
+    date: 2026-10-13
+    profiles: [real]
+  r1_battery_drain_pct_per_min:
+    value: {hanging: 0.7, balancing: 1.0}
+    unit: "% of the pack per minute (the BMS's soc), r1mc3.battery's words only (no threshold acts on it)"
+    source: "HW2 day 2 (results/hw2_20261013/STEPS.md: 64 % at 08:14 CST ... the battery swaps; balancing ~115 W): ~0.7 %/min hanging, ~1 %/min balancing; r1mc3.battery.SWAP_AT_PCT 30 = a planning word (day 2 swapped at 62 % and 33 %; the 4 Oct trouble began near 19 %)"
+    status: measured
+    date: 2026-10-13
+    profiles: [real]
+  # <<< s13:ops

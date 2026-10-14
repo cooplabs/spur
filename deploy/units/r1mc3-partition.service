@@ -1,0 +1,20 @@
+# r1mc3 (v3): the real-time CPU partition (deploy/rt/partition.sh apply --move-tasks; RT_SETUP.md stage 1), once per
+# boot, before the core. HW1 (fixes #12 / #21): it was a hand step after every power-up (with --nic-irq 229 because
+# the auto-detection picked the wrong xhci line, and --move-tasks that moved nothing). Pulled in by r1rt.service and
+# r1rt-stand.service (Wants= + After=) - not enabled on its own, so a backpack that does not start v3 keeps its
+# defaults (no MAXN / jetson_clocks). A failure here never blocks the core (Wants=, not Requires=): r1rt still starts
+# and logs its RT grants. Undo by hand: `sudo bash /opt/r1mc3/current/deploy/rt/partition.sh undo` (or a reboot after
+# `systemctl mask r1mc3-partition.service`). Moves no motor, publishes nothing.
+[Unit]
+Description=r1mc3 real-time CPU partition (IRQs -> CPUs 0-4, the motor NIC's xhci line -> CPU 6, MAXN)
+Documentation=file:///opt/r1mc3/current/docs/hardware/RT_SETUP.md
+After=network-online.target
+Wants=network-online.target
+Before=r1rt.service r1rt-stand.service r1guard.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/bin/bash /opt/r1mc3/current/deploy/rt/partition.sh apply --move-tasks
+StandardOutput=journal
+StandardError=journal

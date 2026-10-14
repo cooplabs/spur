@@ -1,0 +1,16 @@
+# r1mc3 (v3) eth10 guard (DESIGN.md D18, U8): v2's eth10 recovery unchanged while no controller runs; only logs while
+# r1rt / r1guard (or v2's r1mc2 serve) run, and never calls ethtool then. Installed by deploy/eth10/install.sh, only
+# with the user's OK (HW1 step B4.1, docs/hardware/USB_NETWORK.md). Conflicts with v2's r1-eth10-guard.service:
+# systemd never runs both (starting one stops the other); v2's files stay as they are.
+[Unit]
+Description=r1mc3 eth10 guard: EEE off + reset eth10 on robot silence, log-only while r1rt / r1guard / r1mc2 serve run
+After=network-online.target NetworkManager.service
+Conflicts=r1-eth10-guard.service
+
+[Service]
+ExecStart=/bin/bash /usr/local/bin/r1mc3-eth10-guard.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

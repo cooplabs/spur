@@ -1,0 +1,213 @@
+{
+ "tool": "r1mc3.record.pads_rest",
+ "threshold": 5.0,
+ "hands": {
+  "left": {
+   "samples": 250,
+   "tare_samples": 13,
+   "duration_s": 9.93,
+   "rate_hz": 25.1,
+   "threshold": 5.0,
+   "pads": [
+    {
+     "pad": 0,
+     "name": "thumb pad",
+     "tare": 102840.0,
+     "mean": -0.24,
+     "sd": 5.42,
+     "max": 16.0,
+     "share_over_threshold": 0.198
+    },
+    {
+     "pad": 1,
+     "name": "thumb tip",
+     "tare": 100576.0,
+     "mean": 0.68,
+     "sd": 5.1,
+     "max": 16.0,
+     "share_over_threshold": 0.232
+    },
+    {
+     "pad": 2,
+     "name": "finger A pad",
+     "tare": 102944.0,
+     "mean": 3.31,
+     "sd": 5.49,
+     "max": 16.0,
+     "share_over_threshold": 0.451
+    },
+    {
+     "pad": 3,
+     "name": "finger A tip",
+     "tare": 100648.0,
+     "mean": 3.48,
+     "sd": 5.98,
+     "max": 16.0,
+     "share_over_threshold": 0.494
+    },
+    {
+     "pad": 4,
+     "name": "finger B pad",
+     "tare": 103448.0,
+     "mean": -10.36,
+     "sd": 7.41,
+     "max": 8.0,
+     "share_over_threshold": 0.013
+    },
+    {
+     "pad": 5,
+     "name": "finger B tip",
+     "tare": 100560.0,
+     "mean": -2.57,
+     "sd": 5.24,
+     "max": 8.0,
+     "share_over_threshold": 0.08
+    },
+    {
+     "pad": 6,
+     "name": "palm 1",
+     "tare": 100616.0,
+     "mean": -3.38,
+     "sd": 6.23,
+     "max": 8.0,
+     "share_over_threshold": 0.135
+    },
+    {
+     "pad": 7,
+     "name": "palm 2",
+     "tare": 100680.0,
+     "mean": -5.13,
+     "sd": 5.41,
+     "max": 8.0,
+     "share_over_threshold": 0.038
+    },
+    {
+     "pad": 8,
+     "name": "palm 3",
+     "tare": 100576.0,
+     "mean": 3.17,
+     "sd": 4.67,
+     "max": 16.0,
+     "share_over_threshold": 0.388
+    }
+   ],
+   "pads_over_threshold_most_of_the_time": 0,
+   "pads_ever_over_threshold": 9,
+   "noise_sd_median": 5.42,
+   "noise_vs_threshold": 1.1,
+   "invalid_states": 0
+  },
+  "right": {
+   "samples": 250,
+   "tare_samples": 11,
+   "duration_s": 9.96,
+   "rate_hz": 25.0,
+   "threshold": 5.0,
+   "pads": [
+    {
+     "pad": 0,
+     "name": "thumb pad",
+     "tare": 102888.0,
+     "mean": -15.97,
+     "sd": 8.17,
+     "max": 0.0,
+     "share_over_threshold": 0.0
+    },
+    {
+     "pad": 1,
+     "name": "thumb tip",
+     "tare": 100624.0,
+     "mean": 0.94,
+     "sd": 5.92,
+     "max": 16.0,
+     "share_over_threshold": 0.276
+    },
+    {
+     "pad": 2,
+     "name": "finger A pad",
+     "tare": 102680.0,
+     "mean": -8.87,
+     "sd": 6.93,
+     "max": 8.0,
+     "share_over_threshold": 0.025
+    },
+    {
+     "pad": 3,
+     "name": "finger A tip",
+     "tare": 100576.0,
+     "mean": -0.13,
+     "sd": 5.43,
+     "max": 16.0,
+     "share_over_threshold": 0.209
+    },
+    {
+     "pad": 4,
+     "name": "finger B pad",
+     "tare": 102880.0,
+     "mean": -4.82,
+     "sd": 6.57,
+     "max": 16.0,
+     "share_over_threshold": 0.088
+    },
+    {
+     "pad": 5,
+     "name": "finger B tip",
+     "tare": 100552.0,
+     "mean": -1.81,
+     "sd": 5.01,
+     "max": 8.0,
+     "share_over_threshold": 0.105
+    },
+    {
+     "pad": 6,
+     "name": "palm 1",
+     "tare": 101976.0,
+     "mean": -4.02,
+     "sd": 5.94,
+     "max": 8.0,
+     "share_over_threshold": 0.075
+    },
+    {
+     "pad": 7,
+     "name": "palm 2",
+     "tare": 100944.0,
+     "mean": -1.77,
+     "sd": 6.53,
+     "max": 16.0,
+     "share_over_threshold": 0.201
+    },
+    {
+     "pad": 8,
+     "name": "palm 3",
+     "tare": 102480.0,
+     "mean": -5.82,
+     "sd": 6.73,
+     "max": 16.0,
+     "share_over_threshold": 0.05
+    }
+   ],
+   "pads_over_threshold_most_of_the_time": 0,
+   "pads_ever_over_threshold": 8,
+   "noise_sd_median": 6.53,
+   "noise_vs_threshold": 1.3,
+   "invalid_states": 0
+  }
+ },
+ "words": [
+  "left: 250 states over 9.93 s; at rest 0 of 9 pads read 'contact' most of the time (9 at least once) with the threshold 5; the pads' noise sd (median) 5.42 = 1.1 x the threshold; the noisiest: thumb pad (max 16 above its tare). The threshold is NOT changed here (raising it loosens a guard: the user's decision on these numbers).",
+  "right: 250 states over 9.96 s; at rest 0 of 9 pads read 'contact' most of the time (8 at least once) with the threshold 5; the pads' noise sd (median) 6.53 = 1.3 x the threshold; the noisiest: thumb tip (max 16 above its tare). The threshold is NOT changed here (raising it loosens a guard: the user's decision on these numbers)."
+ ],
+ "r1d_contact_bits": {
+  "pad_left": 132,
+  "pad_right": 288,
+  "valid": true,
+  "t_ns": 1158485432738,
+  "writes": 94774,
+  "errors": 0
+ },
+ "r1d_contact_words": {
+  "left": "r1d's guards see 2 of 9 left pads in contact now",
+  "right": "r1d's guards see 2 of 9 right pads in contact now"
+ },
+ "ok": true
+}

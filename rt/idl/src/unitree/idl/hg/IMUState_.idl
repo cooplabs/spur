@@ -1,0 +1,10 @@
+// Reconstructed from unitree_sdk2@63096d0 include/unitree/idl/hg/IMUState_.hpp (see rt/idl/SOURCE.md).
+module unitree_hg { module msg { module dds_ {
+struct IMUState_ {
+  float quaternion[4];
+  float gyroscope[3];
+  float accelerometer[3];
+  float rpy[3];
+  short temperature;
+};
+}; }; };

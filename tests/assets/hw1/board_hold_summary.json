@@ -1,0 +1,20 @@
+{
+ "board_hold_20ms": {
+  "source": "20261011T215102Z: the 20 ms pause's lowstate recording (.lowstate.npz)",
+  "actual_ms": 20.069,
+  "max_motion_during_rad": 2.72042676806453e-05,
+  "ticks_during": 19
+ },
+ "board_hold_100ms": {
+  "source": "20261011T215131Z: the 100 ms pause's lowstate recording (.lowstate.npz)",
+  "actual_ms": 100.081,
+  "max_motion_during_rad": 3.2297577708961106e-05,
+  "ticks_during": 100
+ },
+ "board_hold_500ms": {
+  "source": "20261011T215157Z: the 500 ms pause's lowstate recording (.lowstate.npz)",
+  "actual_ms": 500.063,
+  "max_motion_during_rad": 0.014086420536041255,
+  "ticks_during": 500
+ }
+}

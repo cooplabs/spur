@@ -1,0 +1,35 @@
+# r1mc3 (v3) guard: the hot standby that takes the ownership token when r1rt's heartbeat goes stale (DESIGN.md §4.3
+# rung 2). It must outlive r1rt: NO BindsTo= / PartOf= / Requires= on r1rt.service (a stop or crash of r1rt must
+# never stop the guard). Manual stop refused (RefuseManualStop); never SIGKILLed by a stop; never damps by itself.
+[Unit]
+Description=r1mc3 guard (r1guard, takes over a stalled r1rt within ~10 ms)
+Documentation=file:///opt/r1mc3/current/docs/architecture/GUARD.md
+# No Wants= on r1rt (session 6): starting this unit must never pull in the unlocked r1rt.service, which Conflicts=
+# r1rt-stand.service and would replace the stand session's core. r1mc3-svc starts the right core first.
+After=r1rt.service r1rt-stand.service
+RefuseManualStop=yes
+
+[Service]
+Type=simple
+User=unitree
+# session 9 (#29's open race): the shared file + the real-time overlay (a bounded receive buffer; install.sh
+# --rt-dds-rcvbuf bounded|shared writes it)
+Environment=CYCLONEDDS_URI=file:///etc/r1mc3/cyclonedds.xml,file:///etc/r1mc3/cyclonedds_rt.xml
+ExecStart=/opt/r1mc3/current/bin/r1guard --config /etc/r1mc3/r1rt.cfg --shm-name /r1mc3.rt --domain 0
+ExecStop=-/opt/r1mc3/current/bin/python -I /opt/r1mc3/current/deploy/bin/r1mc3_motorcheck.py --shm-name /r1mc3.rt
+KillSignal=SIGTERM
+SendSIGKILL=no
+TimeoutStopSec=infinity
+Restart=no
+CPUSchedulingPolicy=fifo
+CPUSchedulingPriority=88
+CPUAffinity=5
+LimitRTPRIO=88
+LimitMEMLOCK=infinity
+OOMScoreAdjust=-1000
+# No CPU accounting keys (see r1rt.service: SCHED_FIFO in the root cpu cgroup).
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,34 @@
+# r1mc3 (v3) guard, OBSERVE-ONLY: the heartbeat + the warm shadow, but it NEVER takes the token (r1guard --observe-only,
+# guard.takeover_enabled 0). FOR THE STAND SESSION'S BOARD-HOLD TEST ONLY (DESIGN §14.1 item 6: the LowCmd pause needs the guard's
+# takeover disabled - disabling a safety function, an explicit-OK step on the day, robot on its stand only).
+# Conflicts= r1guard.service (symmetric in systemd): `systemctl start r1guard-observe` stops the armed guard as a
+# dependency (allowed despite its RefuseManualStop; the armed guard exits on SIGTERM only on standby - PROCESSES.md - so
+# check `r1 status` shows it on standby first), and `systemctl start r1guard` afterwards stops this one and re-arms.
+# Not enabled at boot, not started by r1mc3-svc. Same limits / never-kill settings as r1guard.service.
+[Unit]
+Description=r1mc3 guard OBSERVE-ONLY (board-hold test only: never takes the token)
+Documentation=file:///opt/r1mc3/current/docs/architecture/GUARD.md
+After=r1rt.service r1rt-stand.service
+Conflicts=r1guard.service
+RefuseManualStop=yes
+
+[Service]
+Type=simple
+User=unitree
+# session 9 (#29's open race): the shared file + the real-time overlay (a bounded receive buffer; install.sh
+# --rt-dds-rcvbuf bounded|shared writes it)
+Environment=CYCLONEDDS_URI=file:///etc/r1mc3/cyclonedds.xml,file:///etc/r1mc3/cyclonedds_rt.xml
+ExecStart=/opt/r1mc3/current/bin/r1guard --config /etc/r1mc3/r1rt.cfg --shm-name /r1mc3.rt --domain 0 --observe-only
+ExecStop=-/opt/r1mc3/current/bin/python -I /opt/r1mc3/current/deploy/bin/r1mc3_motorcheck.py --shm-name /r1mc3.rt
+KillSignal=SIGTERM
+SendSIGKILL=no
+TimeoutStopSec=infinity
+Restart=no
+CPUSchedulingPolicy=fifo
+CPUSchedulingPriority=88
+CPUAffinity=5
+LimitRTPRIO=88
+LimitMEMLOCK=infinity
+OOMScoreAdjust=-1000
+StandardOutput=journal
+StandardError=journal

@@ -1,0 +1,9 @@
+// Reconstructed from unitree_sdk2@63096d0 include/unitree/robot/internal/internal_idl_decl/Response_.hpp (see SOURCE.md here).
+#include "unitree/idl/api/ResponseHeader_.idl"
+module unitree_api { module msg { module dds_ {
+struct Response_ {
+  unitree_api::msg::dds_::ResponseHeader_ header;
+  string data;
+  sequence<octet> binary;
+};
+}; }; };

@@ -1,0 +1,11 @@
+// Reconstructed from unitree_sdk2@63096d0 include/unitree/idl/hg/LowCmd_.hpp (see rt/idl/SOURCE.md).
+#include "unitree/idl/hg/MotorCmd_.idl"
+module unitree_hg { module msg { module dds_ {
+struct LowCmd_ {
+  octet mode_pr;
+  octet mode_machine;
+  MotorCmd_ motor_cmd[35];
+  unsigned long reserve[4];
+  unsigned long crc;
+};
+}; }; };

@@ -1,0 +1,45 @@
+{
+ "T_site_cam": [
+  [
+   0.05746289,
+   -0.322453868,
+   0.944839415,
+   0.015122316
+  ],
+  [
+   -0.997741136,
+   -0.051532452,
+   0.043093303,
+   0.027706973
+  ],
+  [
+   0.03479429,
+   -0.945181416,
+   -0.324686692,
+   -0.024151884
+  ],
+  [
+   0.0,
+   0.0,
+   0.0,
+   1.0
+  ]
+ ],
+ "model": {
+  "lens": "pinhole",
+  "f": 125.063,
+  "cx": 257.698,
+  "cy": 205.257,
+  "k1": -0.0007,
+  "depth": "z"
+ },
+ "width": 544,
+ "height": 448,
+ "frame": "v3 (r1mc3.world.Geometry.set_stance: the IMU mount rotation undone)",
+ "stream": "stereo_patch_pc1/left",
+ "status": "CANDIDATE - NOT installed (the user's OK; session 12 recommends keeping the installed file for HW2 day 2 and re-fitting this lens's mount with r1mc3.measure.head_mount first)",
+ "lens_source": "HW2 day 1 C3 ChArUco recording (results/hw2_20261012/cam/20261013T032404Z_cam_charuco.r1cam.mcap, sha256 59c650bf410e33fc...): r1sim.sysid.camera_fit lens --still (the plan's hold-still frames: 83 views / 36 of 81 holds, degenerate views dropped): pinhole + k1 RMS 0.389 px, leave-one-out median 0.331 px (B5 <= 1 px met); all 1718 usable frames: f 124.971 / cx 257.902 / cy 205.168 / k1 -0.0022, RMS 0.343 px",
+ "mount_source": "INTERIM: the 4 Oct s3_cal 16 taped marks (tests/assets/tier_a/a5/s3_cal_marks.json) re-fitted under this lens (r1sim.sysid.camera_mount --lens): 1.162 px RMS, left-out median 4.1 mm (the installed file on the same marks: 0.648 px, 3.0 mm - its lens was fitted TO those marks); one image of coplanar marks fixes the mount's distance along the line of sight poorly (the mount moved [27.78, -12.99, 1.28] mm)",
+ "note": "session 12: day 1's 'f 150.05, the image centre, 18 % off' was the fit's starting guess (one degenerate view stopped OpenCV's calibrateCamera); the converged C3 lens is within 1.5 % / ~1.5 px of the installed one (the same stereo-service stream)",
+ "source": "HW2 day 1 C3 (lens) + our 4 Oct capture runs_calib/s3_cal (interim mount)"
+}

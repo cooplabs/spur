@@ -1,0 +1,59 @@
+Spur (r1mc3) - a controller and simulator for the Unitree R1 humanoid with two Dex3-1 hands
+Copyright 2026 Coop
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+Third-party material vendored in this repository
+------------------------------------------------
+Each item below was read from the LICENSE file at the exact source commit named here (checked 14 Oct 2026). The
+licence texts travel with the files.
+
+models/r1/
+  Unitree R1 MJCF model and its meshes, from unitreerobotics/unitree_rl_mjlab at commit
+  1425b15f73bd4095f0df53709d7c389c3eb9e790 (src/assets/robots/unitree_r1/xmls/r1.xml and its
+  mesh folder). Copyright Unitree Robotics. Licensed under the Apache License, Version 2.0
+  (models/r1/LICENCE = the repository's LICENCE file at that commit, byte for byte).
+  The XML is stored unchanged under the name r1_mjlab.xml and its 43 meshes unchanged in
+  models/r1/meshes/ (both checked byte for byte against that commit); every change the simulator makes
+  (masses, hands, sensors, actuators) is applied at load time in code (sim/r1sim/model.py) and
+  recorded in models/provenance.yaml.
+
+models/dex3_1/
+  Unitree Dex3-1 hand descriptions (dex3_1_l.urdf, dex3_1_r.urdf) and their 16 link meshes
+  (meshes/*.STL), from unitreerobotics/unitree_ros at commit
+  5994d4faef0a9cadd3287f8de0199a67eeb2a259 (robots/dexterous_hand_description/dex3_1/).
+  Copyright (c) 2016-2022 HangZhou YuShu TECHNOLOGY CO.,LTD. ("Unitree Robotics").
+  Licensed under the BSD 3-Clause License (models/dex3_1/LICENSE). Unchanged.
+
+rt/idl/unitree_hg/, rt/idl/unitree_api/, rt/idl/crc.h
+  Unitree's CycloneDDS-generated message headers (hg low-level and hand messages, the RPC
+  envelope, the motion-switcher client declarations) and its CRC routine, from
+  unitreerobotics/unitree_sdk2 at commit 63096d0ac0c5d2dec9d6e0c22cd5233410ca2f36, kept as a
+  reference (not compiled). Copyright (c) 2016-2023 HangZhou YuShu TECHNOLOGY CO.,LTD.
+  ("Unitree Robotics"). Licensed under the BSD 3-Clause License (rt/idl/LICENSE.unitree_sdk2).
+  The IDL files under rt/idl/src/ are our reconstruction of those messages (Apache-2.0, this
+  project); rt/idl/SOURCE.md records the checksums and how the reconstruction is proven.
+
+Fetched at build time (not part of this repository)
+---------------------------------------------------
+  Eigen 3.4.0 (MPL-2.0; built with EIGEN_MPL2_ONLY), rt/cmake/Eigen.cmake, pinned by SHA256.
+  GoogleTest 1.15.2 (BSD 3-Clause), for the C++ tests only, rt/CMakeLists.txt, pinned by SHA256.
+  Eclipse Cyclone DDS and cyclonedds-cxx 0.10.2 (EPL-2.0 OR EDL-1.0), optional, built by
+  rt/idl/build_cyclonedds.sh.
+  The Python dependencies are installed by uv from PyPI (pyproject.toml, uv.lock); among them
+  MuJoCo 3.5.0 (Apache-2.0), nanobind (BSD 3-Clause), mcap (MIT), NumPy (BSD 3-Clause),
+  pydantic (MIT), PyYAML (MIT), OpenCV (Apache-2.0), ONNX (Apache-2.0).
+
+Our own material
+----------------
+  policies/: the balance policy's weights were trained by us (mjlab, Apache-2.0, on the R1
+  model above) and are released under this project's licence; docs/POLICY.md gives the
+  checksums, the provenance and the training recipe.
+
+Not redistributed
+-----------------
+  dex3_server (Unitree's USB-to-DDS bridge for the Dex3-1 hands) is closed source and is not
+  part of this repository; install it from Unitree.
+
+"Unitree", "R1" and "Dex3-1" are names of Unitree Robotics products. This project is not
+affiliated with or endorsed by Unitree Robotics.

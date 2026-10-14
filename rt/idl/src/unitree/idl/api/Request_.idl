@@ -1,0 +1,9 @@
+// Reconstructed from unitree_sdk2@63096d0 include/unitree/robot/internal/internal_idl_decl/Request_.hpp (see SOURCE.md here).
+#include "unitree/idl/api/RequestHeader_.idl"
+module unitree_api { module msg { module dds_ {
+struct Request_ {
+  unitree_api::msg::dds_::RequestHeader_ header;
+  string parameter;
+  sequence<octet> binary;
+};
+}; }; };

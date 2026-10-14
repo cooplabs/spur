@@ -1,0 +1,151 @@
+# CI for r1mc3: everything runs in simulation - no robot, no secrets, no network services.
+#   lint      ruff, ruff format, mypy --strict
+#   test      Linux x86_64 + macOS: the C++ trees (sanitizers where the runtime starts) + ctest, CycloneDDS 0.10.2,
+#             the fast pytest set (the real r1rt / r1guard processes against the simulator included)
+#   focal     Linux arm64 on Ubuntu 20.04 - the base of the R1 backpack's Jetson L4T 35.3.1 (GCC 9): .github/ci/focal.sh
+#   tsan      ThreadSanitizer on the lock-free shared memory and the core's two threads
+#   slow      the slow pytest set (long simulations); realtime: the wall-clock tests, informative only
+name: ci
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  UV_PYTHON: "3.11"
+  PYTEST_ADDOPTS: "-p no:cacheprovider"
+  # LeakSanitizer's slow unwinder, so rt/src/dds_io.cpp's suppression of CycloneDDS's known start-up leak matches
+  # (libddsc has no frame pointers: the fast unwinder stops at ddsrt_malloc)
+  LSAN_OPTIONS: "fast_unwind_on_malloc=0"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy
+
+  test:
+    name: test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - name: Headless OpenGL for MuJoCo rendering (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libosmesa6 libgl1 libglu1-mesa
+          echo "MUJOCO_GL=osmesa" >> "$GITHUB_ENV"
+          echo "PYOPENGL_PLATFORM=osmesa" >> "$GITHUB_ENV"
+      - run: uv sync --locked --extra perception
+      - name: CycloneDDS 0.10.2 (cached; rt/idl/build_cyclonedds.sh's default prefix)
+        id: cdds
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/r1mc3/cyclonedds-0.10.2
+          key: cyclonedds-0.10.2-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('rt/idl/build_cyclonedds.sh') }}
+      - if: steps.cdds.outputs.cache-hit != 'true'
+        run: bash rt/idl/build_cyclonedds.sh
+      - name: the dds extra (CycloneDDS's Python binding, built against the library above)
+        run: |
+          echo "CYCLONEDDS_HOME=$HOME/.cache/r1mc3/cyclonedds-0.10.2" >> "$GITHUB_ENV"
+          CYCLONEDDS_HOME="$HOME/.cache/r1mc3/cyclonedds-0.10.2" uv sync --locked --extra perception --extra dds
+      - name: C++ (Debug, sanitizers where they start)
+        run: |
+          uv run cmake -S rt -B build/rt -G Ninja -DCMAKE_BUILD_TYPE=Debug -DR1RT_SANITIZE=ON
+          uv run cmake --build build/rt
+          uv run ctest --test-dir build/rt --output-on-failure
+      - name: C++ with CycloneDDS (the r1rt / r1guard processes)
+        run: |
+          uv run cmake -S rt -B build/rt_dds -G Ninja -DCMAKE_BUILD_TYPE=Debug -DR1RT_SANITIZE=ON \
+            -DR1RT_WITH_CYCLONEDDS=ON -DCMAKE_PREFIX_PATH="$CYCLONEDDS_HOME"
+          uv run cmake --build build/rt_dds
+          uv run ctest --test-dir build/rt_dds --output-on-failure
+      - name: pytest (fast set)
+        run: uv run pytest -q -m "not realtime and not slow"
+
+  focal:
+    # The robot's own platform: arm64 + Ubuntu 20.04. A plain docker run (no JavaScript actions inside the container).
+    name: focal (Ubuntu 20.04 arm64, GCC 9)
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker run --rm -v "$PWD:/work/src:ro" ubuntu:20.04 bash /work/src/.github/ci/focal.sh
+
+  tsan:
+    # ThreadSanitizer for the lock-free shared memory (seqlock, SPSC ring, ownership token, stop channel) and the core's
+    # writer / policy-thread hand-back driven from two real threads. Linux only (the macOS sanitizer runtimes do not
+    # start on current Apple clang: rt/cmake/SanitizerProbe.cmake).
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked
+      - run: uv run cmake -S rt -B build/rt-tsan -G Ninja -DCMAKE_BUILD_TYPE=Debug -DR1RT_TSAN=ON
+      - run: uv run cmake --build build/rt-tsan
+      - run: uv run ctest --test-dir build/rt-tsan --output-on-failure
+      - name: the writer / policy-thread hand-back, repeated (any race report fails the job)
+        env:
+          TSAN_OPTIONS: "halt_on_error=1 second_deadlock_stack=1"
+        run: build/rt-tsan/r1rt_core_tests --gtest_filter='CoreThreads.*' --gtest_repeat=5
+
+  slow:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libosmesa6 libgl1 libglu1-mesa
+          echo "MUJOCO_GL=osmesa" >> "$GITHUB_ENV"
+          echo "PYOPENGL_PLATFORM=osmesa" >> "$GITHUB_ENV"
+      - run: uv sync --locked --extra perception
+      - run: |
+          uv run cmake -S rt -B build/rt -G Ninja -DCMAKE_BUILD_TYPE=Debug -DR1RT_SANITIZE=ON
+          uv run cmake --build build/rt
+      - run: uv run pytest -q -m "slow and not realtime"
+
+  realtime:
+    # Wall-clock (real-time mode) tests are timing-sensitive on shared runners: run them, report them apart.
+    runs-on: ubuntu-latest
+    needs: test
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libosmesa6 libgl1 libglu1-mesa
+          echo "MUJOCO_GL=osmesa" >> "$GITHUB_ENV"
+          echo "PYOPENGL_PLATFORM=osmesa" >> "$GITHUB_ENV"
+      - run: uv sync --locked --extra perception
+      - run: |
+          uv run cmake -S rt -B build/rt -G Ninja -DCMAKE_BUILD_TYPE=Debug -DR1RT_SANITIZE=ON
+          uv run cmake --build build/rt
+      - run: uv run pytest -q -m realtime

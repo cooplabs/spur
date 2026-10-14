@@ -1,0 +1,15 @@
+// Reconstructed from unitree_sdk2@63096d0 include/unitree/idl/hg/MotorState_.hpp (see rt/idl/SOURCE.md).
+module unitree_hg { module msg { module dds_ {
+struct MotorState_ {
+  octet mode;
+  float q;
+  float dq;
+  float ddq;
+  float tau_est;
+  short temperature[2];
+  float vol;
+  unsigned long sensor[2];
+  unsigned long motorstate;
+  unsigned long reserve[4];
+};
+}; }; };

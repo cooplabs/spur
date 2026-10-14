@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- r1mc3: the overlay for the two real-time units ONLY (r1rt, r1rt-stand, r1guard, r1guard-observe), read AFTER the
+     shared /etc/r1mc3/cyclonedds.xml (their CYCLONEDDS_URI lists both: a later setting overrides an earlier one).
+     Session 9 (#29's open race; the user's decision 11 Oct 2026 "(e) smaller buffer"): a BOUNDED socket receive buffer.
+     After a stop of r1rt / r1guard the DDS receive path must drain every lowstate sample queued in the socket during
+     the stop (stamped fresh, its pose from the stop's start) before a live one arrives, and they publish nothing until
+     then (or a stale pre-stop command stays the board's). The shared 4 MB holds ~1700+ LowState samples (~2.4 KB each;
+     Linux doubles the request: up to ~3400); 256 kB here (Linux: 512 kB effective, <= rmem_max 8 MB) holds ~200 = ~0.2 s
+     of the 1052/s stream. Normal operation needs a few: HW1 (T5, Wi-Fi busy) the receive path kept up within 3 ms
+     (state age max 2.97 ms, no gap > 5 ms) - ~7 packets of lowstate + lowcmd. Everything else (r1d, r1hands, the
+     tools) keeps the shared file's 4 MB. Installed by deploy/install.sh (--rt-dds-rcvbuf bounded, the default);
+     --rt-dds-rcvbuf shared installs deploy/config/cyclonedds_rt_shared.xml instead (no override). -->
+<CycloneDDS xmlns="https://cdds.io/config">
+  <Domain id="any">
+    <Internal>
+      <SocketReceiveBufferSize min="256kB" max="256kB"/>
+    </Internal>
+  </Domain>
+</CycloneDDS>

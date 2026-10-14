@@ -1,0 +1,624 @@
+{
+ "schema": "r1mc3.record_manifest/1",
+ "plan": {
+  "kind": "charuco",
+  "params": {
+   "distances_m": [
+    0.3,
+    0.45,
+    0.6
+   ],
+   "hold_s": 2.0,
+   "move_s": 2.0,
+   "depth_every": 5,
+   "board": "poster_6x4_90"
+  },
+  "duration_s": 325.0,
+  "group": null,
+  "moves": [],
+  "hand": null,
+  "needs_mode": null,
+  "operator": [
+   "t 2-4 s: 0.30 m, top-left, flat: hold still",
+   "t 6-8 s: 0.30 m, top-left, turned ~30 deg left-right: hold still",
+   "t 10-12 s: 0.30 m, top-left, tipped ~30 deg: hold still",
+   "t 14-16 s: 0.30 m, top, flat: hold still",
+   "t 18-20 s: 0.30 m, top, turned ~30 deg left-right: hold still",
+   "t 22-24 s: 0.30 m, top, tipped ~30 deg: hold still",
+   "t 26-28 s: 0.30 m, top-right, flat: hold still",
+   "t 30-32 s: 0.30 m, top-right, turned ~30 deg left-right: hold still",
+   "t 34-36 s: 0.30 m, top-right, tipped ~30 deg: hold still",
+   "t 38-40 s: 0.30 m, left, flat: hold still",
+   "t 42-44 s: 0.30 m, left, turned ~30 deg left-right: hold still",
+   "t 46-48 s: 0.30 m, left, tipped ~30 deg: hold still",
+   "t 50-52 s: 0.30 m, centre, flat: hold still",
+   "t 54-56 s: 0.30 m, centre, turned ~30 deg left-right: hold still",
+   "t 58-60 s: 0.30 m, centre, tipped ~30 deg: hold still",
+   "t 62-64 s: 0.30 m, right, flat: hold still",
+   "t 66-68 s: 0.30 m, right, turned ~30 deg left-right: hold still",
+   "t 70-72 s: 0.30 m, right, tipped ~30 deg: hold still",
+   "t 74-76 s: 0.30 m, bottom-left, flat: hold still",
+   "t 78-80 s: 0.30 m, bottom-left, turned ~30 deg left-right: hold still",
+   "t 82-84 s: 0.30 m, bottom-left, tipped ~30 deg: hold still",
+   "t 86-88 s: 0.30 m, bottom, flat: hold still",
+   "t 90-92 s: 0.30 m, bottom, turned ~30 deg left-right: hold still",
+   "t 94-96 s: 0.30 m, bottom, tipped ~30 deg: hold still",
+   "t 98-100 s: 0.30 m, bottom-right, flat: hold still",
+   "t 102-104 s: 0.30 m, bottom-right, turned ~30 deg left-right: hold still",
+   "t 106-108 s: 0.30 m, bottom-right, tipped ~30 deg: hold still",
+   "t 110-112 s: 0.45 m, top-left, flat: hold still",
+   "t 114-116 s: 0.45 m, top-left, turned ~30 deg left-right: hold still",
+   "t 118-120 s: 0.45 m, top-left, tipped ~30 deg: hold still",
+   "t 122-124 s: 0.45 m, top, flat: hold still",
+   "t 126-128 s: 0.45 m, top, turned ~30 deg left-right: hold still",
+   "t 130-132 s: 0.45 m, top, tipped ~30 deg: hold still",
+   "t 134-136 s: 0.45 m, top-right, flat: hold still",
+   "t 138-140 s: 0.45 m, top-right, turned ~30 deg left-right: hold still",
+   "t 142-144 s: 0.45 m, top-right, tipped ~30 deg: hold still",
+   "t 146-148 s: 0.45 m, left, flat: hold still",
+   "t 150-152 s: 0.45 m, left, turned ~30 deg left-right: hold still",
+   "t 154-156 s: 0.45 m, left, tipped ~30 deg: hold still",
+   "t 158-160 s: 0.45 m, centre, flat: hold still",
+   "t 162-164 s: 0.45 m, centre, turned ~30 deg left-right: hold still",
+   "t 166-168 s: 0.45 m, centre, tipped ~30 deg: hold still",
+   "t 170-172 s: 0.45 m, right, flat: hold still",
+   "t 174-176 s: 0.45 m, right, turned ~30 deg left-right: hold still",
+   "t 178-180 s: 0.45 m, right, tipped ~30 deg: hold still",
+   "t 182-184 s: 0.45 m, bottom-left, flat: hold still",
+   "t 186-188 s: 0.45 m, bottom-left, turned ~30 deg left-right: hold still",
+   "t 190-192 s: 0.45 m, bottom-left, tipped ~30 deg: hold still",
+   "t 194-196 s: 0.45 m, bottom, flat: hold still",
+   "t 198-200 s: 0.45 m, bottom, turned ~30 deg left-right: hold still",
+   "t 202-204 s: 0.45 m, bottom, tipped ~30 deg: hold still",
+   "t 206-208 s: 0.45 m, bottom-right, flat: hold still",
+   "t 210-212 s: 0.45 m, bottom-right, turned ~30 deg left-right: hold still",
+   "t 214-216 s: 0.45 m, bottom-right, tipped ~30 deg: hold still",
+   "t 218-220 s: 0.60 m, top-left, flat: hold still",
+   "t 222-224 s: 0.60 m, top-left, turned ~30 deg left-right: hold still",
+   "t 226-228 s: 0.60 m, top-left, tipped ~30 deg: hold still",
+   "t 230-232 s: 0.60 m, top, flat: hold still",
+   "t 234-236 s: 0.60 m, top, turned ~30 deg left-right: hold still",
+   "t 238-240 s: 0.60 m, top, tipped ~30 deg: hold still",
+   "t 242-244 s: 0.60 m, top-right, flat: hold still",
+   "t 246-248 s: 0.60 m, top-right, turned ~30 deg left-right: hold still",
+   "t 250-252 s: 0.60 m, top-right, tipped ~30 deg: hold still",
+   "t 254-256 s: 0.60 m, left, flat: hold still",
+   "t 258-260 s: 0.60 m, left, turned ~30 deg left-right: hold still",
+   "t 262-264 s: 0.60 m, left, tipped ~30 deg: hold still",
+   "t 266-268 s: 0.60 m, centre, flat: hold still",
+   "t 270-272 s: 0.60 m, centre, turned ~30 deg left-right: hold still",
+   "t 274-276 s: 0.60 m, centre, tipped ~30 deg: hold still",
+   "t 278-280 s: 0.60 m, right, flat: hold still",
+   "t 282-284 s: 0.60 m, right, turned ~30 deg left-right: hold still",
+   "t 286-288 s: 0.60 m, right, tipped ~30 deg: hold still",
+   "t 290-292 s: 0.60 m, bottom-left, flat: hold still",
+   "t 294-296 s: 0.60 m, bottom-left, turned ~30 deg left-right: hold still",
+   "t 298-300 s: 0.60 m, bottom-left, tipped ~30 deg: hold still",
+   "t 302-304 s: 0.60 m, bottom, flat: hold still",
+   "t 306-308 s: 0.60 m, bottom, turned ~30 deg left-right: hold still",
+   "t 310-312 s: 0.60 m, bottom, tipped ~30 deg: hold still",
+   "t 314-316 s: 0.60 m, bottom-right, flat: hold still",
+   "t 318-320 s: 0.60 m, bottom-right, turned ~30 deg left-right: hold still",
+   "t 322-324 s: 0.60 m, bottom-right, tipped ~30 deg: hold still"
+  ],
+  "how_to_stop": "`r1 stop` (or the remote): the stream ends, the joint decelerates to HOLD (TTL 0.1 s)",
+  "camera_streams": [
+   "left",
+   "right",
+   "depth"
+  ],
+  "prompts": 81
+ },
+ "base": null,
+ "group_joints": [],
+ "status": "done",
+ "reason": "",
+ "t_start_mono_ns": 2045641571075,
+ "t_end_mono_ns": 2370648402584,
+ "utc_start": "2026-10-13T03:24:04.081654+00:00",
+ "utc_end": "2026-10-13T03:29:29.088486+00:00",
+ "pushes": 0,
+ "refused": 0,
+ "hand_cmds": 0,
+ "r1log_files": [
+  "/var/lib/r1mc3/logs/r1log_20261013T025440Z_002.mcap",
+  "/var/lib/r1mc3/logs/r1log_20261013T025440Z_003.mcap"
+ ],
+ "hands_mcap": null,
+ "hand_samples": 0,
+ "press_notes": null,
+ "camera": {
+  "plan": {
+   "streams": [
+    "left",
+    "right",
+    "depth"
+   ],
+   "depth_every": 5,
+   "video": false,
+   "schedule": [
+    {
+     "t_start": 2.0,
+     "t_end": 4.0,
+     "say": "0.30 m, top-left, flat: hold still"
+    },
+    {
+     "t_start": 6.0,
+     "t_end": 8.0,
+     "say": "0.30 m, top-left, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 10.0,
+     "t_end": 12.0,
+     "say": "0.30 m, top-left, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 14.0,
+     "t_end": 16.0,
+     "say": "0.30 m, top, flat: hold still"
+    },
+    {
+     "t_start": 18.0,
+     "t_end": 20.0,
+     "say": "0.30 m, top, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 22.0,
+     "t_end": 24.0,
+     "say": "0.30 m, top, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 26.0,
+     "t_end": 28.0,
+     "say": "0.30 m, top-right, flat: hold still"
+    },
+    {
+     "t_start": 30.0,
+     "t_end": 32.0,
+     "say": "0.30 m, top-right, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 34.0,
+     "t_end": 36.0,
+     "say": "0.30 m, top-right, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 38.0,
+     "t_end": 40.0,
+     "say": "0.30 m, left, flat: hold still"
+    },
+    {
+     "t_start": 42.0,
+     "t_end": 44.0,
+     "say": "0.30 m, left, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 46.0,
+     "t_end": 48.0,
+     "say": "0.30 m, left, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 50.0,
+     "t_end": 52.0,
+     "say": "0.30 m, centre, flat: hold still"
+    },
+    {
+     "t_start": 54.0,
+     "t_end": 56.0,
+     "say": "0.30 m, centre, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 58.0,
+     "t_end": 60.0,
+     "say": "0.30 m, centre, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 62.0,
+     "t_end": 64.0,
+     "say": "0.30 m, right, flat: hold still"
+    },
+    {
+     "t_start": 66.0,
+     "t_end": 68.0,
+     "say": "0.30 m, right, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 70.0,
+     "t_end": 72.0,
+     "say": "0.30 m, right, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 74.0,
+     "t_end": 76.0,
+     "say": "0.30 m, bottom-left, flat: hold still"
+    },
+    {
+     "t_start": 78.0,
+     "t_end": 80.0,
+     "say": "0.30 m, bottom-left, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 82.0,
+     "t_end": 84.0,
+     "say": "0.30 m, bottom-left, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 86.0,
+     "t_end": 88.0,
+     "say": "0.30 m, bottom, flat: hold still"
+    },
+    {
+     "t_start": 90.0,
+     "t_end": 92.0,
+     "say": "0.30 m, bottom, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 94.0,
+     "t_end": 96.0,
+     "say": "0.30 m, bottom, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 98.0,
+     "t_end": 100.0,
+     "say": "0.30 m, bottom-right, flat: hold still"
+    },
+    {
+     "t_start": 102.0,
+     "t_end": 104.0,
+     "say": "0.30 m, bottom-right, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 106.0,
+     "t_end": 108.0,
+     "say": "0.30 m, bottom-right, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 110.0,
+     "t_end": 112.0,
+     "say": "0.45 m, top-left, flat: hold still"
+    },
+    {
+     "t_start": 114.0,
+     "t_end": 116.0,
+     "say": "0.45 m, top-left, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 118.0,
+     "t_end": 120.0,
+     "say": "0.45 m, top-left, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 122.0,
+     "t_end": 124.0,
+     "say": "0.45 m, top, flat: hold still"
+    },
+    {
+     "t_start": 126.0,
+     "t_end": 128.0,
+     "say": "0.45 m, top, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 130.0,
+     "t_end": 132.0,
+     "say": "0.45 m, top, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 134.0,
+     "t_end": 136.0,
+     "say": "0.45 m, top-right, flat: hold still"
+    },
+    {
+     "t_start": 138.0,
+     "t_end": 140.0,
+     "say": "0.45 m, top-right, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 142.0,
+     "t_end": 144.0,
+     "say": "0.45 m, top-right, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 146.0,
+     "t_end": 148.0,
+     "say": "0.45 m, left, flat: hold still"
+    },
+    {
+     "t_start": 150.0,
+     "t_end": 152.0,
+     "say": "0.45 m, left, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 154.0,
+     "t_end": 156.0,
+     "say": "0.45 m, left, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 158.0,
+     "t_end": 160.0,
+     "say": "0.45 m, centre, flat: hold still"
+    },
+    {
+     "t_start": 162.0,
+     "t_end": 164.0,
+     "say": "0.45 m, centre, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 166.0,
+     "t_end": 168.0,
+     "say": "0.45 m, centre, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 170.0,
+     "t_end": 172.0,
+     "say": "0.45 m, right, flat: hold still"
+    },
+    {
+     "t_start": 174.0,
+     "t_end": 176.0,
+     "say": "0.45 m, right, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 178.0,
+     "t_end": 180.0,
+     "say": "0.45 m, right, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 182.0,
+     "t_end": 184.0,
+     "say": "0.45 m, bottom-left, flat: hold still"
+    },
+    {
+     "t_start": 186.0,
+     "t_end": 188.0,
+     "say": "0.45 m, bottom-left, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 190.0,
+     "t_end": 192.0,
+     "say": "0.45 m, bottom-left, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 194.0,
+     "t_end": 196.0,
+     "say": "0.45 m, bottom, flat: hold still"
+    },
+    {
+     "t_start": 198.0,
+     "t_end": 200.0,
+     "say": "0.45 m, bottom, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 202.0,
+     "t_end": 204.0,
+     "say": "0.45 m, bottom, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 206.0,
+     "t_end": 208.0,
+     "say": "0.45 m, bottom-right, flat: hold still"
+    },
+    {
+     "t_start": 210.0,
+     "t_end": 212.0,
+     "say": "0.45 m, bottom-right, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 214.0,
+     "t_end": 216.0,
+     "say": "0.45 m, bottom-right, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 218.0,
+     "t_end": 220.0,
+     "say": "0.60 m, top-left, flat: hold still"
+    },
+    {
+     "t_start": 222.0,
+     "t_end": 224.0,
+     "say": "0.60 m, top-left, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 226.0,
+     "t_end": 228.0,
+     "say": "0.60 m, top-left, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 230.0,
+     "t_end": 232.0,
+     "say": "0.60 m, top, flat: hold still"
+    },
+    {
+     "t_start": 234.0,
+     "t_end": 236.0,
+     "say": "0.60 m, top, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 238.0,
+     "t_end": 240.0,
+     "say": "0.60 m, top, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 242.0,
+     "t_end": 244.0,
+     "say": "0.60 m, top-right, flat: hold still"
+    },
+    {
+     "t_start": 246.0,
+     "t_end": 248.0,
+     "say": "0.60 m, top-right, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 250.0,
+     "t_end": 252.0,
+     "say": "0.60 m, top-right, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 254.0,
+     "t_end": 256.0,
+     "say": "0.60 m, left, flat: hold still"
+    },
+    {
+     "t_start": 258.0,
+     "t_end": 260.0,
+     "say": "0.60 m, left, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 262.0,
+     "t_end": 264.0,
+     "say": "0.60 m, left, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 266.0,
+     "t_end": 268.0,
+     "say": "0.60 m, centre, flat: hold still"
+    },
+    {
+     "t_start": 270.0,
+     "t_end": 272.0,
+     "say": "0.60 m, centre, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 274.0,
+     "t_end": 276.0,
+     "say": "0.60 m, centre, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 278.0,
+     "t_end": 280.0,
+     "say": "0.60 m, right, flat: hold still"
+    },
+    {
+     "t_start": 282.0,
+     "t_end": 284.0,
+     "say": "0.60 m, right, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 286.0,
+     "t_end": 288.0,
+     "say": "0.60 m, right, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 290.0,
+     "t_end": 292.0,
+     "say": "0.60 m, bottom-left, flat: hold still"
+    },
+    {
+     "t_start": 294.0,
+     "t_end": 296.0,
+     "say": "0.60 m, bottom-left, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 298.0,
+     "t_end": 300.0,
+     "say": "0.60 m, bottom-left, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 302.0,
+     "t_end": 304.0,
+     "say": "0.60 m, bottom, flat: hold still"
+    },
+    {
+     "t_start": 306.0,
+     "t_end": 308.0,
+     "say": "0.60 m, bottom, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 310.0,
+     "t_end": 312.0,
+     "say": "0.60 m, bottom, tipped ~30 deg: hold still"
+    },
+    {
+     "t_start": 314.0,
+     "t_end": 316.0,
+     "say": "0.60 m, bottom-right, flat: hold still"
+    },
+    {
+     "t_start": 318.0,
+     "t_end": 320.0,
+     "say": "0.60 m, bottom-right, turned ~30 deg left-right: hold still"
+    },
+    {
+     "t_start": 322.0,
+     "t_end": 324.0,
+     "say": "0.60 m, bottom-right, tipped ~30 deg: hold still"
+    }
+   ]
+  },
+  "r1cam": {
+   "schema": "r1mc3.r1cam_manifest/1",
+   "kind": "charuco",
+   "label": "",
+   "params": {
+    "distances_m": [
+     0.3,
+     0.45,
+     0.6
+    ],
+    "hold_s": 2.0,
+    "move_s": 2.0,
+    "depth_every": 5,
+    "board": "poster_6x4_90"
+   },
+   "status": "done",
+   "reason": "",
+   "source": "robot",
+   "streams": [
+    "left",
+    "right",
+    "depth"
+   ],
+   "depth_every": 5,
+   "frames": {
+    "left": 2428,
+    "right": 2428,
+    "depth": 488
+   },
+   "dropped_queue": 0,
+   "skipped_depth": 1950,
+   "write_errors": 0,
+   "t_start_mono_ns": 2045641141683,
+   "t_end_mono_ns": 2370674327266,
+   "duration_s": 325.033,
+   "utc_start": "2026-10-13T03:24:04.081222+00:00",
+   "files": [
+    {
+     "path": "/var/lib/r1mc3/records/20261013T032404Z_cam_charuco.r1cam.mcap",
+     "bytes": 402401650,
+     "sha256": "59c650bf410e33fce77b7727fdff63335e3020625c9fd85a57b8ab2bceeb328d"
+    }
+   ],
+   "source_stats": {
+    "source": "robot",
+    "streams": {
+     "left": {
+      "active": false,
+      "frames": 2722,
+      "age_s": 0.51,
+      "error": null
+     },
+     "right": {
+      "active": false,
+      "frames": 2722,
+      "age_s": 0.509,
+      "error": null
+     },
+     "depth": {
+      "active": false,
+      "frames": 2737,
+      "age_s": 0.388,
+      "error": null
+     }
+    }
+   },
+   "coverage": {
+    "say": "no board in view: show the board (0.30 m, top-left, flat)",
+    "cells_done": 0,
+    "cells": 81,
+    "frames": 0,
+    "detected": 0,
+    "counts": {}
+   }
+  }
+ },
+ "core_mode_at_end": "on_stand"
+}

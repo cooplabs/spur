@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- r1mc3 on the backpack: CycloneDDS bound to the motor NIC only (DESIGN.md §11.3: eth10 = the USB network adapter,
+     named by its MAC rule; never the Wi-Fi). Installed to /etc/r1mc3/cyclonedds.xml by deploy/install.sh ONLY when
+     that file does not exist yet (site config is never overwritten). Between our own processes we use shared memory,
+     not DDS loopback. The receive-thread priorities are set by r1rt / r1guard themselves (DESIGN §2.1). -->
+<CycloneDDS xmlns="https://cdds.io/config">
+  <Domain id="any">
+    <General>
+      <Interfaces>
+        <NetworkInterface name="eth10" priority="default" multicast="default"/>
+      </Interfaces>
+    </General>
+    <Internal>
+      <SocketReceiveBufferSize min="4MB"/>
+    </Internal>
+  </Domain>
+</CycloneDDS>

@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+# The operator's service word on the backpack (DESIGN.md §2.1, §4.4). Starting publishes nothing (r1rt starts in
+# MONITOR). Stopping REFUSES (exit 3) while r1rt / r1guard own the motors - the session ends the standard way first
+# (hold the robot -> r1 damp -> stand -> r1 shutdown) - and never damps. r1rt / r1guard carry RefuseManualStop=yes,
+# so `systemctl stop` is refused for them by systemd itself; this script stops them with SIGTERM (systemctl kill)
+# only after the motor check said it is safe, and r1rt itself ignores SIGTERM in a publishing mode (a second line).
+#   r1mc3-svc start [--stand] | stop | status | enable | disable      [--root DIR] [--dry-run]
+# --stand (session 6, HW1): the core is r1rt-stand.service (`r1rt --stand-session`: every entry into BALANCE refused
+# for its lifetime). Lifting that = `stop`, then `start` without --stand (DEPLOY.md "HW1: the stand lock"): the whole
+# stack restarts, because r1rt creates (and on exit unlinks) the segment the others attach to once - a lone r1rt swap
+# would leave r1guard / r1d / r1log on the old segment (tested in sim, session 6).
+set -euo pipefail
+here="$(cd "$(dirname "$0")/.." && pwd)"
+. "$here/lib.sh"
+r1_parse_common "$@"
+set -- ${R1_ARGS[@]+"${R1_ARGS[@]}"}
+cmd="${1:-status}"
+stand=0
+[ "${2:-}" = "--stand" ] && stand=1
+[ $# -le 1 ] || [ "$stand" = 1 -a "$cmd" = start -a $# -eq 2 ] || r1_die "usage: r1mc3-svc start [--stand] | stop | status | enable | disable"
+REST="r1guard r1log r1d r1mc3-inhibit"
+READY_WAIT_S="${R1_SVC_READY_WAIT_S:-15}"   # session 13: how long `start` waits for each ready line
+# The unit's journal since t0 (a command, so the tests can give a fake one: R1_SVC_JOURNAL "<unit> <t0>").
+svc_journal() {
+  if [ -n "${R1_SVC_JOURNAL:-}" ]; then "$R1_SVC_JOURNAL" "$1" "$2"; return 0; fi
+  journalctl -u "$1.service" --since "@$2" -o cat --no-pager 2>/dev/null || true
+}
+# Wait (bounded) for <proc>'s ready line ({"ready":true,"process":"<proc>",...}) in <unit>'s journal since t0; dies
+# saying which process is missing and what to do (never retries a start by itself).
+svc_wait_ready() {
+  local unit="$1" proc="$2" t0="$3" n=0 max
+  if { ! r1_is_real_root || [ "$R1_DRY_RUN" = 1 ]; } && [ -z "${R1_SVC_JOURNAL:-}" ]; then
+    r1_log "would wait <= ${READY_WAIT_S} s for $proc's ready line (journalctl -u $unit.service)"
+    return 0
+  fi
+  max=$(( READY_WAIT_S * 5 ))
+  while [ "$n" -lt "$max" ]; do
+    if svc_journal "$unit" "$t0" | grep -q "\"ready\":true,\"process\":\"$proc\""; then
+      r1_log "ready: $proc"
+      return 0
+    fi
+    sleep 0.2
+    n=$(( n + 1 ))
+  done
+  r1_log "$unit's last journal lines:"
+  svc_journal "$unit" "$t0" | tail -n 5 >&2 || true
+  r1_die "NO READY LINE from $proc within ${READY_WAIT_S} s ($unit.service) - the stack is NOT ready: r1mc3-svc stop, then start again (or, for r1guard alone in MONITOR: sudo systemctl start r1guard)"
+}
+START_ORDER="r1rt $REST"
+CORES="r1rt r1rt-stand"
+case "$cmd" in
+  start)
+    core=r1rt; [ "$stand" = 1 ] && core=r1rt-stand
+    # never start over a running core: the other variant would be stopped by Conflicts= (in a publishing mode r1rt
+    # refuses SIGTERM and systemd would wait forever) and the others would stay on the old segment
+    if r1_is_real_root && [ "$R1_DRY_RUN" != 1 ]; then
+      for c in $CORES; do
+        if systemctl is-active --quiet "$c.service"; then r1_die "$c.service is already running: r1mc3-svc stop first"; fi
+      done
+    else
+      r1_log "would check: no core running ($CORES)"
+    fi
+    # session 13 (HW2 day 2, 08:35 CST: r1guard started 8 ms after r1rt and exited "attach /r1mc3.rt: segment smaller
+    # than expected" - r1rt was still sizing its segment; the day's fix was `sudo systemctl start r1guard`): the guard
+    # starts only after r1rt's READY line (the segment is made by then), and the start checks BOTH ready lines and
+    # says which one is missing. (r1guard itself now also waits, bounded, for a segment being sized.)
+    t0="$(date +%s)"
+    r1_sys systemctl start "$core.service"
+    svc_wait_ready "$core" r1rt "$t0"
+    r1_sys systemctl start r1guard.service
+    svc_wait_ready r1guard r1guard "$t0"
+    for u in $REST; do [ "$u" = r1guard ] || r1_sys systemctl start "$u.service"; done
+    if [ "$stand" = 1 ]; then
+      r1_log "started with the STAND LOCK (r1rt --stand-session: BALANCE refused until a stop + start without --stand)"
+    fi
+    r1_log "started (MONITOR: nothing published until a takeover / on-stand request; ready: r1rt + r1guard)"
+    ;;
+  stop)
+    r1_require_motors_free "stopping the services"
+    r1_sys systemctl stop r1d.service      # no new commands first
+    r1_sys systemctl stop r1log.service    # flushes and closes its MCAP files
+    r1_require_motors_free "stopping r1rt / r1guard"   # again, right before the RT processes
+    r1_sys systemctl kill --signal=SIGTERM r1guard.service
+    for c in $CORES; do   # whichever core runs (r1rt or the stand session's r1rt-stand); the other is inactive
+      if ! r1_is_real_root || systemctl is-active --quiet "$c.service"; then
+        r1_sys systemctl kill --signal=SIGTERM "$c.service"
+      fi
+    done
+    r1_sys systemctl kill --signal=SIGTERM r1mc3-inhibit.service
+    r1_log "stop requested (r1rt / r1guard exit by themselves in MONITOR / DAMP; check with: r1mc3-svc status)"
+    ;;
+  status)
+    for u in $CORES $REST; do r1_sys systemctl --no-pager --lines=0 status "$u.service" || true; done
+    echo -n "motors: "; r1_motor_check || true
+    ;;
+  enable|disable)
+    # Boot-time start is the user's decision (default: not enabled); enabling starts nothing now.
+    for u in $START_ORDER; do r1_sys systemctl "$cmd" "$u.service"; done
+    ;;
+  *) r1_die "unknown command $cmd (start [--stand] | stop | status | enable | disable)" ;;
+esac

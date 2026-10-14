@@ -1,0 +1,8 @@
+// Reconstructed from unitree_sdk2@63096d0 include/unitree/idl/hg/HandCmd_.hpp (see rt/idl/SOURCE.md).
+#include "unitree/idl/hg/MotorCmd_.idl"
+module unitree_hg { module msg { module dds_ {
+struct HandCmd_ {
+  sequence<MotorCmd_> motor_cmd;
+  unsigned long reserve[4];
+};
+}; }; };

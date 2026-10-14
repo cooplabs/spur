@@ -1,0 +1,2 @@
+{"task": "R1MC-Manip2-Lean", "period": 0.86, "cmd_limits": [[-0.5, 0.8], [-0.4, 0.4], [-1.0, 1.0]],
+ "arms_external": true, "iterations": 500, "envs": 8192, "unitree_rl_mjlab_commit": "1425b15f73bd4095f0df53709d7c389c3eb9e790", "lean_range_deg": [0, 5], "stance": "stand_lock", "finetune_from": "model_2392.pt"}

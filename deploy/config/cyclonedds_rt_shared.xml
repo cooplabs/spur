@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- r1mc3: the real-time units' overlay with NOTHING in it (deploy/install.sh --rt-dds-rcvbuf shared): r1rt / r1guard
+     then run on the shared /etc/r1mc3/cyclonedds.xml alone (its 4 MB receive buffer, as before session 9). The default
+     is cyclonedds_rt.xml (a bounded 256 kB buffer, the user's decision 11 Oct 2026). -->
+<CycloneDDS xmlns="https://cdds.io/config">
+  <Domain id="any"/>
+</CycloneDDS>

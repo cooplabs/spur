@@ -1,0 +1,503 @@
+# Robot profile: Unitree R1 (26 body joints, mode_machine 1) + two Dex3-1 hands.
+# Validated by r1mc3.config.load_profile (YAML -> validated -> frozen). Every value carries its provenance.
+# Only fields with `tunable: true` (and bounds) may change at runtime; anything else needs `version` raised.
+# Start values taken from v2 (r1mc2, git r21_try 2a4a165) are marked `estimate` until revalidated (sim / HW1).
+# Doc references: docs/DESIGN.md (DESIGN), docs/V2_INVENTORY.md (INV); v2 paths are relative to r1-motor-controller-v2.
+schema: r1mc3.robot_profile/1
+name: r1_dex3
+version: 2
+description: "Unitree R1 + two Dex3-1 hands; version 2 (session 6): the `processes` section added - the source of the robot's r1rt / r1guard config file (python -m r1mc3.rtconfig --profile robot)"
+
+joint_map:
+  num_slots: 35            # unitree_hg LowCmd_.motor_cmd length
+  mode_machine: 1          # R1 26-DoF, observed on our robot
+  mode_pr: 0               # ankles commanded as pitch/roll (PR), observed
+  status: measured
+  source: "SDK body order (unitree_sdk2_python example/r1/low_level); slots confirmed on our robot from the 28 Sep read-only lowstate capture (v2 r1mc2/joints.py:1-29; INV App. E §2.6)"
+  date: 2026-09-28
+  value:
+    - {name: left_hip_pitch, slot: 0}
+    - {name: left_hip_roll, slot: 1}
+    - {name: left_hip_yaw, slot: 2}
+    - {name: left_knee, slot: 3}
+    - {name: left_ankle_pitch, slot: 4}
+    - {name: left_ankle_roll, slot: 5}
+    - {name: right_hip_pitch, slot: 6}
+    - {name: right_hip_roll, slot: 7}
+    - {name: right_hip_yaw, slot: 8}
+    - {name: right_knee, slot: 9}
+    - {name: right_ankle_pitch, slot: 10}
+    - {name: right_ankle_roll, slot: 11}
+    - {name: waist_roll, slot: 12}
+    - {name: waist_yaw, slot: 13}
+    - {name: left_shoulder_pitch, slot: 15}
+    - {name: left_shoulder_roll, slot: 16}
+    - {name: left_shoulder_yaw, slot: 17}
+    - {name: left_elbow, slot: 18}
+    - {name: left_wrist_roll, slot: 19}
+    - {name: right_shoulder_pitch, slot: 22}
+    - {name: right_shoulder_roll, slot: 23}
+    - {name: right_shoulder_yaw, slot: 24}
+    - {name: right_elbow, slot: 25}
+    - {name: right_wrist_roll, slot: 26}
+    - {name: head_pitch, slot: 29}
+    - {name: head_yaw, slot: 30}
+
+rates:
+  writer_hz:
+    value: 500
+    unit: Hz
+    bounds: {min: 200, max: 1000}
+    status: modelling_choice
+    source: "DESIGN §0 D7 / §0.1 D7 (user decision 10 Oct 2026): RT writer 500 Hz, configurable 200-1000, 200 Hz fallback; Unitree's examples write lowcmd at 500 Hz (RESEARCH §0 item 7)"
+    date: 2026-10-10
+  writer_fallback_hz:
+    value: 200
+    unit: Hz
+    status: modelling_choice
+    source: "DESIGN §0.1 D7: 200 Hz fallback if the stock kernel cannot hold 500 Hz (v2 ran 200 Hz live, INV §1)"
+    date: 2026-10-10
+  policy_hz:
+    value: 50
+    unit: Hz
+    status: derived
+    source: "the balance policy's training rate: physics 5 ms x decimation 4 (INV App. E §3.2, policy params/env.yaml)"
+    date: 2026-10-09
+  hands_hz:
+    value: 100
+    unit: Hz
+    status: reported
+    source: "Unitree's Dex3 clients (xr_teleoperate Dex3_1_Controller) at 100 Hz (v2 r1mc2/dex3.py:41-44); DESIGN §0 D7"
+    date: 2026-10-01
+    until: "hand state rate measured on HW1 (INV App. E §5: 85-89 Hz vs ~800 Hz across probes)"
+  executor_hz:
+    value: 100
+    unit: Hz
+    status: modelling_choice
+    source: "DESIGN §0 D7: executor 100 Hz"
+    date: 2026-10-10
+
+limits:
+  position:
+    unit: rad
+    status: official
+    source: "unitree_ros r1_description R1.urdf (sha256 604bbd0c..., unchanged at HEAD 5994d4f); v2 r1mc2/joints.py:42-55 (INV App. E §2.2)"
+    date: 2026-10-09
+    notes: "mechanical limits; the RT core clamps to a margin inside them (v2: 0.05 rad, waist/head yaw +-1.5 rad for cable safety, joints.py:59-66)"
+    value:
+      left_hip_pitch: [-2.9322, 2.5482]
+      left_hip_roll: [-1.0472, 1.7453]
+      left_hip_yaw: [-2.7402, 2.7402]
+      left_knee: [-0.1745, 2.4260]
+      left_ankle_pitch: [-0.8727, 0.5760]
+      left_ankle_roll: [-0.2618, 0.2618]
+      right_hip_pitch: [-2.9322, 2.5482]
+      right_hip_roll: [-1.7453, 1.0472]
+      right_hip_yaw: [-2.7402, 2.7402]
+      right_knee: [-0.1745, 2.4260]
+      right_ankle_pitch: [-0.8727, 0.5760]
+      right_ankle_roll: [-0.2618, 0.2618]
+      waist_roll: [-0.5236, 0.5236]
+      waist_yaw: [-2.618, 2.618]
+      left_shoulder_pitch: [-3.1416, 2.0944]
+      left_shoulder_roll: [-0.2269, 2.4784]
+      left_shoulder_yaw: [-1.9199, 1.9199]
+      left_elbow: [-0.9756, 2.1852]
+      left_wrist_roll: [-1.9199, 1.9199]
+      right_shoulder_pitch: [-3.1416, 2.0944]
+      right_shoulder_roll: [-2.4785, 0.2268]
+      right_shoulder_yaw: [-1.9199, 1.9199]
+      right_elbow: [-0.9756, 2.1852]
+      right_wrist_roll: [-1.9199, 1.9199]
+      head_pitch: [-0.6283, 0.6283]
+      head_yaw: [-2.0071, 2.0071]
+  effort:
+    unit: N*m
+    status: official
+    source: "R1.urdf effort limits (INV App. E §2.2 table); v2 r1mc2/joints.py:56-57 TAU_MAX"
+    date: 2026-10-09
+    value:
+      left_hip_pitch: 60
+      left_hip_roll: 60
+      left_hip_yaw: 60
+      left_knee: 60
+      left_ankle_pitch: 50
+      left_ankle_roll: 50
+      right_hip_pitch: 60
+      right_hip_roll: 60
+      right_hip_yaw: 60
+      right_knee: 60
+      right_ankle_pitch: 50
+      right_ankle_roll: 50
+      waist_roll: 60
+      waist_yaw: 60
+      left_shoulder_pitch: 60
+      left_shoulder_roll: 60
+      left_shoulder_yaw: 33
+      left_elbow: 33
+      left_wrist_roll: 33
+      right_shoulder_pitch: 60
+      right_shoulder_roll: 60
+      right_shoulder_yaw: 33
+      right_elbow: 33
+      right_wrist_roll: 33
+      head_pitch: 33
+      head_yaw: 33
+  velocity:
+    unit: rad/s
+    status: official
+    source: "R1.urdf velocity limits (INV App. E §2.2 table: hips/knee/waist/shoulder pitch+roll 18.8, ankles 30, shoulder yaw/elbow/wrist/head 33.4)"
+    date: 2026-10-09
+    notes: "the ankle linkage's effect on achievable pitch/roll is not modelled (INV App. E §2.2)"
+    value:
+      left_hip_pitch: 18.8
+      left_hip_roll: 18.8
+      left_hip_yaw: 18.8
+      left_knee: 18.8
+      left_ankle_pitch: 30.0
+      left_ankle_roll: 30.0
+      right_hip_pitch: 18.8
+      right_hip_roll: 18.8
+      right_hip_yaw: 18.8
+      right_knee: 18.8
+      right_ankle_pitch: 30.0
+      right_ankle_roll: 30.0
+      waist_roll: 18.8
+      waist_yaw: 18.8
+      left_shoulder_pitch: 18.8
+      left_shoulder_roll: 18.8
+      left_shoulder_yaw: 33.4
+      left_elbow: 33.4
+      left_wrist_roll: 33.4
+      right_shoulder_pitch: 18.8
+      right_shoulder_roll: 18.8
+      right_shoulder_yaw: 33.4
+      right_elbow: 33.4
+      right_wrist_roll: 33.4
+      head_pitch: 33.4
+      head_yaw: 33.4
+  torque_clip_fraction:
+    value: 0.6
+    bounds: {min: 0.1, max: 1.0}
+    status: estimate
+    source: "DESIGN §3.6 (torque at 0.6 x TAU_MAX as v2); v2 r1mc2/controller.py:1423-1426 (_cmd clips tau to +-0.6 TAU_MAX)"
+    date: 2026-10-10
+    until: "Tier B torque identification on HW1 (DESIGN §13.2 B1, B3)"
+
+gains:
+  policy_legs_waist:
+    kp_bounds: {min: 0.0, max: 300.0}
+    kd_bounds: {min: 0.0, max: 10.0}
+    status: derived
+    source: "R1MC-Manip2-Lean ONNX metadata (joint_stiffness / joint_damping); mjlab armature rule kp = armature*wn^2, kd = 2*zeta*armature*wn, wn 2*pi*10, zeta 2 (training r1mc_constants.py:3-8); telemetry kp_legs 84.302 on hardware (INV App. E §0 item 5, §3.4)"
+    date: 2026-10-06
+    notes: "must equal the gains the policy was trained with; changing them needs retraining"
+    value:
+      left_hip_pitch: [84.302, 5.367]
+      left_hip_roll: [84.302, 5.367]
+      left_hip_yaw: [84.302, 5.367]
+      left_knee: [84.302, 5.367]
+      left_ankle_pitch: [31.385, 1.998]
+      left_ankle_roll: [31.385, 1.998]
+      right_hip_pitch: [84.302, 5.367]
+      right_hip_roll: [84.302, 5.367]
+      right_hip_yaw: [84.302, 5.367]
+      right_knee: [84.302, 5.367]
+      right_ankle_pitch: [31.385, 1.998]
+      right_ankle_roll: [31.385, 1.998]
+      waist_roll: [84.302, 5.367]
+      waist_yaw: [84.302, 5.367]
+  arms_manip:
+    kp_bounds: {min: 0.0, max: 300.0}
+    kd_bounds: {min: 0.0, max: 10.0}
+    status: estimate
+    source: "v2 r1mc2/arms.py:34-35 KP_ARM / KD_ARM (60/60/45/45/30, kd 2/2/2/2/1.5), equal to the training Manip+ arm actuators (INV App. E §3.4); used on hardware with gravity feed-forward"
+    date: 2026-10-05
+    until: "Tier B arm identification (steps/chirps on HW1, DESIGN §13.2 B1)"
+    value:
+      left_shoulder_pitch: [60.0, 2.0]
+      left_shoulder_roll: [60.0, 2.0]
+      left_shoulder_yaw: [45.0, 2.0]
+      left_elbow: [45.0, 2.0]
+      left_wrist_roll: [30.0, 1.5]
+      right_shoulder_pitch: [60.0, 2.0]
+      right_shoulder_roll: [60.0, 2.0]
+      right_shoulder_yaw: [45.0, 2.0]
+      right_elbow: [45.0, 2.0]
+      right_wrist_roll: [30.0, 1.5]
+  stiff:
+    kp_bounds: {min: 0.0, max: 300.0}
+    kd_bounds: {min: 0.0, max: 10.0}
+    status: reported
+    source: "v2 r1mc2/joints.py:68-74 KP_STIFF / KD_STIFF, from Unitree's official R1 low-level example (unitree_sdk2_python) per the v2 comment"
+    date: 2026-09-28
+    until: "checked against unitree_sdk2_python example/r1/low_level at a pinned commit; ON_STAND hold gains decided in the sim rehearsal (DESIGN §3.5)"
+    value:
+      left_hip_pitch: [200.0, 3.0]
+      left_hip_roll: [200.0, 3.0]
+      left_hip_yaw: [200.0, 3.0]
+      left_knee: [200.0, 3.0]
+      left_ankle_pitch: [200.0, 3.0]
+      left_ankle_roll: [200.0, 3.0]
+      right_hip_pitch: [200.0, 3.0]
+      right_hip_roll: [200.0, 3.0]
+      right_hip_yaw: [200.0, 3.0]
+      right_knee: [200.0, 3.0]
+      right_ankle_pitch: [200.0, 3.0]
+      right_ankle_roll: [200.0, 3.0]
+      waist_roll: [300.0, 5.0]
+      waist_yaw: [300.0, 5.0]
+      left_shoulder_pitch: [100.0, 2.0]
+      left_shoulder_roll: [100.0, 2.0]
+      left_shoulder_yaw: [100.0, 2.0]
+      left_elbow: [100.0, 2.0]
+      left_wrist_roll: [50.0, 2.0]
+      right_shoulder_pitch: [100.0, 2.0]
+      right_shoulder_roll: [100.0, 2.0]
+      right_shoulder_yaw: [100.0, 2.0]
+      right_elbow: [100.0, 2.0]
+      right_wrist_roll: [50.0, 2.0]
+      head_pitch: [50.0, 2.0]
+      head_yaw: [10.0, 0.1]
+
+safety:   # DESIGN §4.2-4.4; never tunable; no rung of the ladder damps (DESIGN §4.3)
+  lowstate_age_count_ms:
+    value: 10
+    unit: ms
+    status: modelling_choice
+    source: "DESIGN §4.2: lowstate older than 10 ms is counted"
+    date: 2026-10-10
+  lowstate_age_resend_ms:
+    value: 100
+    unit: ms
+    status: estimate
+    source: "DESIGN §4.2 (v2 semantics); v2 r1mc2/controller.py:306 stale_hold_s 0.1 (resend the last command)"
+    date: 2026-10-10
+    until: "revalidated by the fault-injection tests in the v3 sim (gate G-HW1) and the board hold time (the board-hold test) on HW1"
+  lowstate_age_fault_ms:
+    value: 1000
+    unit: ms
+    status: estimate
+    source: "DESIGN §4.2; v2 r1mc2/controller.py:307 stale_fault_s 1.0 (v3: fault without limp)"
+    date: 2026-10-10
+    until: "revalidated in the v3 sim (G-HW1) and by the board-hold test on HW1"
+  arm_tilt_stop_deg:
+    value: 4
+    unit: deg
+    status: estimate
+    source: "DESIGN §4.2: arm tilt stop 4 deg over the tilt at the start of an arm motion (v2 S10, r1mc2/controller.py:3456-3470; INV App. A §4)"
+    date: 2026-10-10
+    until: "revalidated in the v3 sim (G-HW1)"
+  fall_detect_deg:
+    value: 30
+    unit: deg
+    status: estimate
+    source: "DESIGN §4.2: fall detection 30 deg, the policy keeps running, no automatic damp; v2 r1mc2/controller.py:301 tilt_fault_deg 30"
+    date: 2026-10-10
+    until: "revalidated in the v3 sim (G-HW1)"
+  policy_age_inline_ms:
+    value: 40
+    unit: ms
+    status: modelling_choice
+    source: "DESIGN §3.1 step 6, §4.3 rung 1: two policy periods at 50 Hz, then the policy runs inline in the writer"
+    date: 2026-10-10
+  guard_heartbeat_writer_periods:
+    value: 5
+    unit: periods
+    status: modelling_choice
+    source: "DESIGN §4.3 rung 2: r1guard takes over when r1rt's heartbeat is older than 5 writer periods (10 ms at 500 Hz)"
+    date: 2026-10-10
+    notes: "must stay below the board's own hold time, which the board-hold test measures on HW1 (DESIGN §16 K1)"
+  takeover_max_tilt_deg:
+    value: 12
+    unit: deg
+    status: estimate
+    source: "DESIGN §4.4 v2's proven takeover gates; v2 r1mc2/runtime.py:345-377 (INV App. A §1.1)"
+    date: 2026-10-10
+    until: "revalidated in the DDS-bridge sim rehearsal (G-HW1)"
+  takeover_max_state_age_ms:
+    value: 50
+    unit: ms
+    status: estimate
+    source: "v2 takeover gate state age <= 0.05 s, r1mc2/runtime.py:345-377 (INV App. A §1.1)"
+    date: 2026-10-10
+    until: "revalidated in the DDS-bridge sim rehearsal (G-HW1)"
+  takeover_max_dq_rad_s:
+    value: 0.5
+    unit: rad/s
+    status: estimate
+    source: "v2 takeover gate max |dq| <= 0.5 rad/s, r1mc2/runtime.py:345-377 (INV App. A §1.1); DESIGN §4.4"
+    date: 2026-10-10
+    until: "revalidated in the DDS-bridge sim rehearsal (G-HW1)"
+  takeover_max_temp_c:
+    value: 60
+    unit: degC
+    status: estimate
+    source: "v2 takeover gate max temp < 60 C, r1mc2/runtime.py:345-377, 356-358 (INV App. A §4 S7); DESIGN §4.4"
+    date: 2026-10-10
+    until: "revalidated with the thermal model (DESIGN §13.1 A4)"
+  takeover_release_timeout_s:
+    value: 4.0
+    unit: s
+    status: estimate
+    source: "DESIGN §3.5, §4.4: ReleaseMode must succeed within 4 s (v2's sequence, INV App. A §3.3)"
+    date: 2026-10-10
+    until: "revalidated in the DDS-bridge sim rehearsal (G-HW1)"
+  # session 9 (U19 / D25; docs/sim/STATE_AGE.md): the state-age limit + the "hold the stand" rung. The age is always
+  # measured (the STATE_OLD alarm, r1 status); the rung stays OFF (0) until the user's OK after the sim evidence.
+  state_age_limit_ms:
+    value: 10
+    unit: ms
+    status: modelling_choice
+    source: "the user's target 11 Oct 2026 (~10 ms sustained); B7 (session 8): a constant extra 15 ms of latency degrades, 20 ms falls; HW1 T5: lowstate age p99 1.0 / max 3.0 ms; docs/sim/STATE_AGE.md"
+    date: 2026-10-11
+    until: "HW2: the content age logged with the rung off (no false episodes) before the rung is armed"
+  state_age_sustain_ms:
+    value: 100
+    unit: ms
+    status: modelling_choice
+    source: "docs/sim/STATE_AGE.md (session 9 sweep): 100 ms = no freeze on a 100 ms loss (harmless today), every simulated fall still caught (delay 40 / 50 ms + a 5 N s push: 0 / 3); the core's built-in default stays 60 ms"
+    date: 2026-10-11
+    until: "HW2 (log-only first), then the user's OK"
+  stale_rung:
+    value: 0
+    unit: "1"
+    status: modelling_choice
+    source: "OFF until the user's OK (U19 / D25: built + sim-tested in session 9, then the OK before it is armed on the robot); 1 = hold the stand, 2 = hold the stand then return to the policy"
+    date: 2026-10-11
+  stale_return_live_ms:
+    value: 500
+    unit: ms
+    status: modelling_choice
+    source: "docs/sim/STATE_AGE.md: stale_rung 2 returns to the policy after the state has been live this long (and the freeze ramp ended)"
+    date: 2026-10-11
+
+executor:   # DESIGN §3.3
+  keepalive_ms:
+    value: 50
+    unit: ms
+    status: modelling_choice
+    source: "DESIGN §3.3: r1d renews a TRAJECTORY keepalive every 50 ms"
+    date: 2026-10-10
+  trajectory_stop_time_s:
+    value: 0.15
+    unit: s
+    status: modelling_choice
+    source: "DESIGN §3.3: on keepalive expiry decelerate to a stop within the configured stop time (default 150 ms), then HOLD"
+    date: 2026-10-10
+  stream_ttl_max_arm_s:
+    value: 0.3
+    unit: s
+    status: modelling_choice
+    source: "DESIGN §3.3: STREAM messages carry a TTL <= 300 ms for the arms (v2 arm.twist / arm.jog ttl 0.3, INV §4)"
+    date: 2026-10-10
+  speed_scale:
+    value: 1.0
+    bounds: {min: 0.1, max: 1.0}
+    tunable: true
+    status: modelling_choice
+    source: "DESIGN §3.3 speed control on the trajectory clock; v2 `limits` speed_scale 0.1-1.0 (INV App. B §1.2)"
+    date: 2026-10-10
+
+processes:   # session 6: the r1rt / r1guard values the sections above do not cover; never tunable (safety / timing).
+  # With rates, limits, gains, safety and executor above this is the WHOLE robot config file (python -m r1mc3.rtconfig
+  # --profile robot; each written key's provenance goes to <file>.provenance.json). The policy interface (ONNX metadata),
+  # its weights and the stand pose stay the repository's / the model's - see python/r1mc3/rtconfig.py ROBOT_KEPT.
+  stand_freeze_ramp_s:
+    value: 0.4
+    unit: s
+    status: modelling_choice
+    source: "DESIGN §3.5 STAND_FREEZE ramp 0.3-0.5 s; the user's decision U3 / DESIGN D15 (10 Oct 2026): 0.4 s kept until the HW1 fast-ramp test (HW1_RUNBOOK_ADDITIONS S5); r1sim/v3_core.py STAND_RAMP_S"
+    date: 2026-10-10
+  takeover_blend_stand_s:
+    value: 1.0
+    unit: s
+    status: modelling_choice
+    source: "DESIGN §3.5: blend into ours over 0.3 s (walk) / 1.0 s (stand); D22 / U13 (10 Oct 2026): ON_STAND's 1 s blend into a stiff hold; r1sim/v3_core.py TAKEOVER_BLEND_S"
+    date: 2026-10-10
+  damp_kd:
+    unit: N*m*s/rad
+    status: reported
+    source: "DESIGN §3.5 DAMP (kp 0, kd 3 legs, arms 1-3); v2 r1mc2/joints.py:79-80 KD_DAMP (3.0 everywhere, head 1.0) - the damping v2's operator damp used on hardware"
+    date: 2026-10-10
+    until: "HW1: the operator's damp at the session end (E2) on the stand, the legs' fall speed watched"
+    value:
+      left_hip_pitch: 3.0
+      left_hip_roll: 3.0
+      left_hip_yaw: 3.0
+      left_knee: 3.0
+      left_ankle_pitch: 3.0
+      left_ankle_roll: 3.0
+      right_hip_pitch: 3.0
+      right_hip_roll: 3.0
+      right_hip_yaw: 3.0
+      right_knee: 3.0
+      right_ankle_pitch: 3.0
+      right_ankle_roll: 3.0
+      waist_roll: 3.0
+      waist_yaw: 3.0
+      left_shoulder_pitch: 3.0
+      left_shoulder_roll: 3.0
+      left_shoulder_yaw: 3.0
+      left_elbow: 3.0
+      left_wrist_roll: 3.0
+      right_shoulder_pitch: 3.0
+      right_shoulder_roll: 3.0
+      right_shoulder_yaw: 3.0
+      right_elbow: 3.0
+      right_wrist_roll: 3.0
+      head_pitch: 1.0
+      head_yaw: 1.0
+  on_stand_hold_gains:
+    value: stiff
+    status: modelling_choice
+    source: "DESIGN §3.5 ON_STAND 'stiff hold by default'; D22 / U13 (10 Oct 2026): a 1 s blend into a stiff hold of the measured pose; 'stiff' = gains.stiff above (written as all-zero on_stand_kp / on_stand_kd: the core's convention for 'the stand gains', step_api.h)"
+    date: 2026-10-10
+  action_abs_max:
+    value: 50.0
+    status: derived
+    source: "the raw network output never left +-40 on the policy golden sets (S2: |action| max 39.7, random inputs); r1sim/v3_core.py ACTION_ABS_MAX - beyond it the action is invalid (rung 3, STAND_FREEZE)"
+    date: 2026-10-10
+  builtin_max_age_ms:
+    value: 100
+    unit: ms
+    status: estimate
+    source: "takeover / ON_STAND gate 'the built-in's rt/lowcmd fresh' (DESIGN §4.4 v2's gate: built-in lowcmd fresh and stiff; INV App. A §1.1); r1sim/v3_core.py BUILTIN_MAX_AGE_S"
+    date: 2026-10-10
+    until: "HW1 B1.2: the built-in's rt/lowcmd rate measured read-only"
+  builtin_min_leg_kp:
+    value: 10.0
+    status: estimate
+    source: "takeover gate 'the built-in visibly holding' (DESIGN §4.4); the stand lock's 200 and the built-in's walk 84 / 31 are well above it (r1sim/v3_core.py BUILTIN_MIN_LEG_KP); ON_STAND does not apply it (Unitree's damping on the stand, D22)"
+    date: 2026-10-10
+    until: "HW1 B1.2: the built-in's leg kp read on rt/lowcmd in MONITOR"
+  mirror_max_dev_rad:
+    value: 0.6
+    unit: rad
+    status: modelling_choice
+    source: "DESIGN §3.5 takeover failure branches: a MIRROR target further than this from the measured joint raises the takeover alarm (keep mirroring, no damp); r1sim/v3_core.py MIRROR_MAX_DEV_RAD"
+    date: 2026-10-10
+  takeover_mirror_alarm_s:
+    value: 5.0
+    unit: s
+    status: modelling_choice
+    source: "DESIGN §3.5: ReleaseMode must succeed within 4 s (safety.takeover_release_timeout_s, r1d); the core alarms after 5 s still in MIRROR (a release that never answered); r1sim/v3_core.py TAKEOVER_MIRROR_ALARM_S"
+    date: 2026-10-10
+  guard_max_age_ms:
+    value: 50
+    unit: ms
+    status: modelling_choice
+    source: "DESIGN §4.4 / RT_CORE_INTERFACES.md session 5 GUARD_ABSENT: r1guard's heartbeat older than 50 ms = absent (an alarm; TAKEOVER / ON_STAND refused); r1sim/v3_core.py GUARD_MAX_AGE_S"
+    date: 2026-10-10
+  guard_cycle_hz:
+    value: 1000
+    unit: Hz
+    status: modelling_choice
+    source: "DESIGN §2.1: r1guard's heartbeat check at 1 kHz (FIFO 88, CPU 5); python/r1mc3/rtconfig.py GUARD_DEFAULTS"
+    date: 2026-10-10
+  guard_takeover_blend_s:
+    value: 0.3
+    unit: s
+    status: modelling_choice
+    source: "r1guard's fallback blend from a layout-1 mirror (GUARD.md session 5: with layout 2 the guard continues the core's own blend length); rt/include/r1rt/guard.hpp GuardParams default"
+    date: 2026-10-10

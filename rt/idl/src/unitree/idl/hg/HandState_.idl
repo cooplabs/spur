@@ -1,0 +1,17 @@
+// Reconstructed from unitree_sdk2@63096d0 include/unitree/idl/hg/HandState_.hpp (see rt/idl/SOURCE.md).
+#include "unitree/idl/hg/IMUState_.idl"
+#include "unitree/idl/hg/MotorState_.idl"
+#include "unitree/idl/hg/PressSensorState_.idl"
+module unitree_hg { module msg { module dds_ {
+struct HandState_ {
+  sequence<MotorState_> motor_state;
+  sequence<PressSensorState_> press_sensor_state;
+  IMUState_ imu_state;
+  float power_v;
+  float power_a;
+  float system_v;
+  float device_v;
+  unsigned long error[2];
+  unsigned long reserve[2];
+};
+}; }; };

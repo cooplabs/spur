@@ -1,0 +1,392 @@
+{
+ "left_hip_pitch": {
+  "point": "left_sole",
+  "d_cm": [
+   -5.61,
+   0.02,
+   0.03
+  ],
+  "words": "back 5.6 cm",
+  "rot": [
+   -0.0,
+   0.09,
+   -0.042
+  ],
+  "rot_words": "pitches: front DOWN"
+ },
+ "left_hip_roll": {
+  "point": "left_sole",
+  "d_cm": [
+   -0.84,
+   5.46,
+   0.44
+  ],
+  "words": "to the robot's LEFT 5.5 cm",
+  "rot": [
+   0.095,
+   0.012,
+   0.027
+  ],
+  "rot_words": "rolls: left side UP (toward the robot's right)"
+ },
+ "left_hip_yaw": {
+  "point": "left_toe",
+  "d_cm": [
+   0.07,
+   -0.32,
+   0.01
+  ],
+  "words": "to the robot's RIGHT 0.3 cm",
+  "rot": [
+   -0.026,
+   -0.004,
+   0.096
+  ],
+  "rot_words": "turns: front toward the robot's LEFT"
+ },
+ "left_knee": {
+  "point": "left_sole",
+  "d_cm": [
+   -3.52,
+   -0.04,
+   0.5
+  ],
+  "words": "back 3.5 cm",
+  "rot": [
+   -0.001,
+   0.1,
+   0.004
+  ],
+  "rot_words": "pitches: front DOWN"
+ },
+ "left_ankle_pitch": {
+  "point": "left_toe",
+  "d_cm": [
+   -0.62,
+   0.06,
+   -1.58
+  ],
+  "words": "back 0.6 cm, down 1.6 cm",
+  "rot": [
+   -0.001,
+   0.1,
+   0.004
+  ],
+  "rot_words": "pitches: front DOWN"
+ },
+ "left_ankle_roll": {
+  "point": "left_outer_edge",
+  "d_cm": [
+   -0.02,
+   0.52,
+   0.52
+  ],
+  "words": "to the robot's LEFT 0.5 cm, up 0.5 cm",
+  "rot": [
+   0.1,
+   0.001,
+   0.003
+  ],
+  "rot_words": "rolls: left side UP (toward the robot's right)"
+ },
+ "right_hip_pitch": {
+  "point": "right_sole",
+  "d_cm": [
+   -5.61,
+   -0.02,
+   0.03
+  ],
+  "words": "back 5.6 cm",
+  "rot": [
+   0.0,
+   0.09,
+   0.042
+  ],
+  "rot_words": "pitches: front DOWN"
+ },
+ "right_hip_roll": {
+  "point": "right_sole",
+  "d_cm": [
+   0.69,
+   5.5,
+   0.09
+  ],
+  "words": "to the robot's LEFT 5.5 cm",
+  "rot": [
+   0.095,
+   -0.012,
+   0.027
+  ],
+  "rot_words": "rolls: left side UP (toward the robot's right)"
+ },
+ "right_hip_yaw": {
+  "point": "right_toe",
+  "d_cm": [
+   -0.04,
+   -0.33,
+   0.0
+  ],
+  "words": "to the robot's RIGHT 0.3 cm",
+  "rot": [
+   -0.026,
+   0.004,
+   0.096
+  ],
+  "rot_words": "turns: front toward the robot's LEFT"
+ },
+ "right_knee": {
+  "point": "right_sole",
+  "d_cm": [
+   -3.52,
+   0.04,
+   0.5
+  ],
+  "words": "back 3.5 cm",
+  "rot": [
+   0.001,
+   0.1,
+   -0.004
+  ],
+  "rot_words": "pitches: front DOWN"
+ },
+ "right_ankle_pitch": {
+  "point": "right_toe",
+  "d_cm": [
+   -0.62,
+   -0.06,
+   -1.58
+  ],
+  "words": "back 0.6 cm, down 1.6 cm",
+  "rot": [
+   0.001,
+   0.1,
+   -0.004
+  ],
+  "rot_words": "pitches: front DOWN"
+ },
+ "right_ankle_roll": {
+  "point": "right_outer_edge",
+  "d_cm": [
+   0.02,
+   0.57,
+   -0.47
+  ],
+  "words": "to the robot's LEFT 0.6 cm, down 0.5 cm",
+  "rot": [
+   0.1,
+   -0.001,
+   0.003
+  ],
+  "rot_words": "rolls: left side UP (toward the robot's right)"
+ },
+ "waist_roll": {
+  "point": "left_sole",
+  "d_cm": [
+   0.0,
+   -7.31,
+   -0.73
+  ],
+  "words": "to the robot's RIGHT 7.3 cm",
+  "rot": [
+   -0.1,
+   -0.0,
+   -0.0
+  ],
+  "rot_words": "rolls: left side DOWN (toward the robot's left)"
+ },
+ "waist_yaw": {
+  "point": "left_toe",
+  "d_cm": [
+   1.02,
+   -1.5,
+   0.0
+  ],
+  "words": "forward 1.0 cm, to the robot's RIGHT 1.5 cm",
+  "rot": [
+   0.0,
+   -0.0,
+   -0.1
+  ],
+  "rot_words": "turns: front toward the robot's RIGHT"
+ },
+ "left_shoulder_pitch": {
+  "point": "left_hand",
+  "d_cm": [
+   -4.04,
+   0.04,
+   -0.16
+  ],
+  "words": "back 4.0 cm",
+  "rot": [
+   -0.0,
+   0.096,
+   0.026
+  ],
+  "rot_words": "pitches: front DOWN"
+ },
+ "left_shoulder_roll": {
+  "point": "left_hand",
+  "d_cm": [
+   0.0,
+   3.67,
+   0.9
+  ],
+  "words": "to the robot's LEFT 3.7 cm",
+  "rot": [
+   0.1,
+   -0.0,
+   0.0
+  ],
+  "rot_words": "rolls: left side UP (toward the robot's right)"
+ },
+ "left_shoulder_yaw": {
+  "point": "left_hand_front",
+  "d_cm": [
+   -0.01,
+   0.95,
+   0.18
+  ],
+  "words": "to the robot's LEFT 0.9 cm",
+  "rot": [
+   0.0,
+   -0.019,
+   0.098
+  ],
+  "rot_words": "turns: front toward the robot's LEFT"
+ },
+ "left_elbow": {
+  "point": "left_hand",
+  "d_cm": [
+   -1.87,
+   0.02,
+   -0.11
+  ],
+  "words": "back 1.9 cm",
+  "rot": [
+   -0.0,
+   0.098,
+   0.019
+  ],
+  "rot_words": "pitches: front DOWN"
+ },
+ "left_wrist_roll": {
+  "point": "left_hand_front",
+  "d_cm": [
+   -0.03,
+   -0.58,
+   -0.12
+  ],
+  "words": "to the robot's RIGHT 0.6 cm",
+  "rot": [
+   0.017,
+   0.019,
+   -0.097
+  ],
+  "rot_words": "turns: front toward the robot's RIGHT"
+ },
+ "right_shoulder_pitch": {
+  "point": "right_hand",
+  "d_cm": [
+   -4.04,
+   -0.04,
+   -0.16
+  ],
+  "words": "back 4.0 cm",
+  "rot": [
+   0.0,
+   0.096,
+   -0.026
+  ],
+  "rot_words": "pitches: front DOWN"
+ },
+ "right_shoulder_roll": {
+  "point": "right_hand",
+  "d_cm": [
+   0.0,
+   3.74,
+   -0.53
+  ],
+  "words": "to the robot's LEFT 3.7 cm",
+  "rot": [
+   0.1,
+   -0.0,
+   0.0
+  ],
+  "rot_words": "rolls: left side UP (toward the robot's right)"
+ },
+ "right_shoulder_yaw": {
+  "point": "right_hand_front",
+  "d_cm": [
+   -0.08,
+   0.94,
+   -0.18
+  ],
+  "words": "to the robot's LEFT 0.9 cm",
+  "rot": [
+   0.0,
+   0.019,
+   0.098
+  ],
+  "rot_words": "turns: front toward the robot's LEFT"
+ },
+ "right_elbow": {
+  "point": "right_hand",
+  "d_cm": [
+   -1.87,
+   -0.02,
+   -0.11
+  ],
+  "words": "back 1.9 cm",
+  "rot": [
+   0.0,
+   0.098,
+   -0.019
+  ],
+  "rot_words": "pitches: front DOWN"
+ },
+ "right_wrist_roll": {
+  "point": "right_hand_front",
+  "d_cm": [
+   -0.03,
+   -0.58,
+   0.11
+  ],
+  "words": "to the robot's RIGHT 0.6 cm",
+  "rot": [
+   0.017,
+   -0.019,
+   -0.097
+  ],
+  "rot_words": "turns: front toward the robot's RIGHT"
+ },
+ "head_pitch": {
+  "point": "face",
+  "d_cm": [
+   1.12,
+   0.0,
+   -0.87
+  ],
+  "words": "forward 1.1 cm, down 0.9 cm",
+  "rot": [
+   0.0,
+   0.1,
+   0.0
+  ],
+  "rot_words": "pitches: front DOWN"
+ },
+ "head_yaw": {
+  "point": "face",
+  "d_cm": [
+   -0.04,
+   0.8,
+   0.0
+  ],
+  "words": "to the robot's LEFT 0.8 cm",
+  "rot": [
+   0.0,
+   0.0,
+   0.1
+  ],
+  "rot_words": "turns: front toward the robot's LEFT"
+ }
+}

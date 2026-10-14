@@ -1,0 +1,9 @@
+// Reconstructed from unitree_sdk2@63096d0 include/unitree/robot/internal/internal_idl_decl/ResponseHeader_.hpp (see SOURCE.md here).
+#include "unitree/idl/api/RequestIdentity_.idl"
+#include "unitree/idl/api/ResponseStatus_.idl"
+module unitree_api { module msg { module dds_ {
+struct ResponseHeader_ {
+  unitree_api::msg::dds_::RequestIdentity_ identity;
+  unitree_api::msg::dds_::ResponseStatus_ status;
+};
+}; }; };
